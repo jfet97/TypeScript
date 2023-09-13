@@ -1,0 +1,60 @@
+//// [tests/cases/compiler/0test.ts] ////
+
+=== 0test.ts ===
+type Obj = {
+>Obj : Symbol(Obj, Decl(0test.ts, 0, 0))
+
+  a: 1;
+>a : Symbol(a, Decl(0test.ts, 0, 12))
+
+  readonly foo: "";
+>foo : Symbol(foo, Decl(0test.ts, 1, 7))
+
+};
+
+type Resolve<T> = { [K in keyof T as `${K & string}`]: T[K] }
+>Resolve : Symbol(Resolve, Decl(0test.ts, 3, 2))
+>T : Symbol(T, Decl(0test.ts, 5, 13))
+>K : Symbol(K, Decl(0test.ts, 5, 21))
+>T : Symbol(T, Decl(0test.ts, 5, 13))
+>K : Symbol(K, Decl(0test.ts, 5, 21))
+>T : Symbol(T, Decl(0test.ts, 5, 13))
+>K : Symbol(K, Decl(0test.ts, 5, 21))
+
+declare function foo<T>(a: Resolve<T>): T;
+>foo : Symbol(foo, Decl(0test.ts, 5, 61))
+>T : Symbol(T, Decl(0test.ts, 7, 21))
+>a : Symbol(a, Decl(0test.ts, 7, 24))
+>Resolve : Symbol(Resolve, Decl(0test.ts, 3, 2))
+>T : Symbol(T, Decl(0test.ts, 7, 21))
+>T : Symbol(T, Decl(0test.ts, 7, 21))
+
+foo({ bau: 1, miao: 2 });
+>foo : Symbol(foo, Decl(0test.ts, 5, 61))
+>bau : Symbol(bau, Decl(0test.ts, 9, 5))
+>miao : Symbol(miao, Decl(0test.ts, 9, 13))
+
+// type Instance = Resolve<[1,2,3]>
+
+// type PickHom<T, K extends keyof T, E extends PropertyKey = K> = {
+//   [P in keyof T as P extends K | E ? P : never]: T[P];
+// };
+
+// type Instance = PickHom<Obj, "a">
+
+// getHomomorphicTypeVariable usata per ottenere la type variable omomorfa se lo è omomorfa
+
+// function getHomomorphicTypeVariable(type: MappedType) {
+//         const constraintType = getConstraintTypeFromMappedType(type);
+//         if (constraintType.flags & TypeFlags.Index) {
+//             // siccome i flags sono potenze di 2, se il flag è presente allora il risultato è diverso da 0
+//             // che flag? quello di essere TypeFlags.Index cioè un keyof T
+//
+//             const typeVariable = getActualTypeVariable((constraintType as IndexType).type);
+//             if (typeVariable.flags & TypeFlags.TypeParameter) {
+//                 T potrebbe boh essere una unione di stringhe, noi vogliamo che sia una type variable
+//                 return typeVariable as TypeParameter;
+//             }
+//         }
+//         return undefined;
+//     }
