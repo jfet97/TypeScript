@@ -1,15 +1,36 @@
 // @strict: true
 
-type Obj = {
-  a: 1;
-  readonly foo: "";
-};
+// type MyPick<T, P extends keyof T> = {
+//   [K in P]: { value: T[K] };
+// }
 
-type Resolve<T> = { [K in keyof T]: T[K] } & unknown
+// declare function unvalueify<T, K extends keyof T>(t: MyPick<T, K>, keys: K[]): T;
 
-type MyTest<T> = { [K in keyof T & PropertyKey]: T[K] }
+// // T inferito come { a: string; b: string; }
+// unvalueify({
+//   a: { value: "a" },
+//   b: { value: "b" },
+// }, ["a", "b"]);
 
-type EE = MyTest<Obj>
+// declare function unvalueify<T, K extends keyof T>(t: Pick<T, K>, keys: K[]): T;
+
+// // T inferito come { a: string; b: string; }
+// unvalueify({
+//   a: { value: "a" },
+//   b: { value: "b" },
+// }, ["a", "b"]);
+
+
+
+
+
+// type Resolve<T> = { [K in keyof T]: T[K] } & unknown
+
+type MyTest<T> = {
+  [K in keyof (T extends "bau" ? keyof T : {})]: 7
+}
+
+// type EE = MyTest<Obj>
 
 declare function foo<T>(a: MyTest<T>): T;
 
@@ -35,7 +56,7 @@ foo({  miaotest: 2 });
 //
 //             const typeVariable = getActualTypeVariable((constraintType as IndexType).type);
 //             if (typeVariable.flags & TypeFlags.TypeParameter) {
-//                 T potrebbe boh essere una unione di stringhe, noi vogliamo che sia una type variable
+//                 T potrebbe boh essere un literal oggetto, noi vogliamo che sia una type variable, uno degli input
 //                 return typeVariable as TypeParameter;
 //             }
 //         }
