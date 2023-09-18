@@ -1,6 +1,6 @@
-//// [tests/cases/compiler/revertedIntersection.ts] ////
+//// [tests/cases/compiler/reverseMappedTypeIntersectionConstraint.ts] ////
 
-//// [revertedIntersection.ts]
+//// [reverseMappedTypeIntersectionConstraint.ts]
 type StateConfig<TAction extends string> = {
   entry?: TAction
   states?: Record<string, StateConfig<TAction>>;
@@ -92,7 +92,7 @@ foo({x: 1, y: 'foo'});
 
 foo({...{x: 1, y: 'foo'}}); // no error because lack of excess property check by design
 
-//// [revertedIntersection.js]
+//// [reverseMappedTypeIntersectionConstraint.js]
 "use strict";
 var __assign = (this && this.__assign) || function () {
     __assign = Object.assign || function(t) {

@@ -1,6 +1,6 @@
-//// [tests/cases/compiler/revertedIntersection.ts] ////
+//// [tests/cases/compiler/reverseMappedTypeIntersectionConstraint.ts] ////
 
-=== revertedIntersection.ts ===
+=== reverseMappedTypeIntersectionConstraint.ts ===
 type StateConfig<TAction extends string> = {
 >StateConfig : StateConfig<TAction>
 
