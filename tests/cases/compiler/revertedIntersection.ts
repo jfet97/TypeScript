@@ -35,7 +35,7 @@ const inferredParams2 = createMachine({
 
 // -----------------------------------------------------------------------------------------
 
-const checkType = <T>() => <U extends T>(value: { [K in keyof U & keyof T]: U[K]}) => value;
+const checkType = <T>() => <U extends T>(value: { [K in keyof U & keyof T]: U[K] }) => value;
 
 const checked = checkType<{x: number, y: string}>()({
   x: 1 as number,
@@ -43,5 +43,18 @@ const checked = checkType<{x: number, y: string}>()({
   z: "z", // undesirable property z is *not* allowed
 });
 
- checked;
+checked;
   // ^?
+
+// -----------------------------------------------------------------------------------------
+
+interface Stuff {
+    field: number;
+    anotherField: string;
+}
+
+declare function doStuffWithStuff<T extends Stuff>(arr: { [K in keyof T & keyof Stuff]: T[K] }[]): T
+
+doStuffWithStuff([
+    { field: 1, anotherField: 'a', extra: 123 },
+])

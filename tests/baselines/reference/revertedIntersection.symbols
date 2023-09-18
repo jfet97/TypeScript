@@ -100,7 +100,7 @@ const inferredParams2 = createMachine({
 
 // -----------------------------------------------------------------------------------------
 
-const checkType = <T>() => <U extends T>(value: { [K in keyof U & keyof T]: U[K]}) => value;
+const checkType = <T>() => <U extends T>(value: { [K in keyof U & keyof T]: U[K] }) => value;
 >checkType : Symbol(checkType, Decl(revertedIntersection.ts, 37, 5))
 >T : Symbol(T, Decl(revertedIntersection.ts, 37, 19))
 >U : Symbol(U, Decl(revertedIntersection.ts, 37, 28))
@@ -130,7 +130,42 @@ const checked = checkType<{x: number, y: string}>()({
 
 });
 
- checked;
+checked;
 >checked : Symbol(checked, Decl(revertedIntersection.ts, 39, 5))
 
   // ^?
+
+// -----------------------------------------------------------------------------------------
+
+interface Stuff {
+>Stuff : Symbol(Stuff, Decl(revertedIntersection.ts, 45, 8))
+
+    field: number;
+>field : Symbol(Stuff.field, Decl(revertedIntersection.ts, 50, 17))
+
+    anotherField: string;
+>anotherField : Symbol(Stuff.anotherField, Decl(revertedIntersection.ts, 51, 18))
+}
+
+declare function doStuffWithStuff<T extends Stuff>(arr: { [K in keyof T & keyof Stuff]: T[K] }[]): T
+>doStuffWithStuff : Symbol(doStuffWithStuff, Decl(revertedIntersection.ts, 53, 1))
+>T : Symbol(T, Decl(revertedIntersection.ts, 55, 34))
+>Stuff : Symbol(Stuff, Decl(revertedIntersection.ts, 45, 8))
+>arr : Symbol(arr, Decl(revertedIntersection.ts, 55, 51))
+>K : Symbol(K, Decl(revertedIntersection.ts, 55, 59))
+>T : Symbol(T, Decl(revertedIntersection.ts, 55, 34))
+>Stuff : Symbol(Stuff, Decl(revertedIntersection.ts, 45, 8))
+>T : Symbol(T, Decl(revertedIntersection.ts, 55, 34))
+>K : Symbol(K, Decl(revertedIntersection.ts, 55, 59))
+>T : Symbol(T, Decl(revertedIntersection.ts, 55, 34))
+
+doStuffWithStuff([
+>doStuffWithStuff : Symbol(doStuffWithStuff, Decl(revertedIntersection.ts, 53, 1))
+
+    { field: 1, anotherField: 'a', extra: 123 },
+>field : Symbol(field, Decl(revertedIntersection.ts, 58, 5))
+>anotherField : Symbol(anotherField, Decl(revertedIntersection.ts, 58, 15))
+>extra : Symbol(extra, Decl(revertedIntersection.ts, 58, 34))
+
+])
+
