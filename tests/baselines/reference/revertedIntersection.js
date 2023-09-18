@@ -35,6 +35,20 @@ const inferredParams2 = createMachine({
   extra: 12,
 });
 
+
+// -----------------------------------------------------------------------------------------
+
+const checkType = <T>() => <U extends T>(value: { [K in keyof U & keyof T]: U[K]}) => value;
+
+const checked = checkType<{x: number, y: string}>()({
+  x: 1 as number,
+  y: "y",
+  z: "z", // undesirable property z is *not* allowed
+});
+
+ checked;
+  // ^?
+
 //// [revertedIntersection.js]
 var inferredParams1 = createMachine({
     entry: "foo",
@@ -54,3 +68,12 @@ var inferredParams2 = createMachine({
     },
     extra: 12,
 });
+// -----------------------------------------------------------------------------------------
+var checkType = function () { return function (value) { return value; }; };
+var checked = checkType()({
+    x: 1,
+    y: "y",
+    z: "z", // undesirable property z is *not* allowed
+});
+checked;
+// ^?

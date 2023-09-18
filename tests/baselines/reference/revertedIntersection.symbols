@@ -96,3 +96,41 @@ const inferredParams2 = createMachine({
 >extra : Symbol(extra, Decl(revertedIntersection.ts, 30, 4))
 
 });
+
+
+// -----------------------------------------------------------------------------------------
+
+const checkType = <T>() => <U extends T>(value: { [K in keyof U & keyof T]: U[K]}) => value;
+>checkType : Symbol(checkType, Decl(revertedIntersection.ts, 37, 5))
+>T : Symbol(T, Decl(revertedIntersection.ts, 37, 19))
+>U : Symbol(U, Decl(revertedIntersection.ts, 37, 28))
+>T : Symbol(T, Decl(revertedIntersection.ts, 37, 19))
+>value : Symbol(value, Decl(revertedIntersection.ts, 37, 41))
+>K : Symbol(K, Decl(revertedIntersection.ts, 37, 51))
+>U : Symbol(U, Decl(revertedIntersection.ts, 37, 28))
+>T : Symbol(T, Decl(revertedIntersection.ts, 37, 19))
+>U : Symbol(U, Decl(revertedIntersection.ts, 37, 28))
+>K : Symbol(K, Decl(revertedIntersection.ts, 37, 51))
+>value : Symbol(value, Decl(revertedIntersection.ts, 37, 41))
+
+const checked = checkType<{x: number, y: string}>()({
+>checked : Symbol(checked, Decl(revertedIntersection.ts, 39, 5))
+>checkType : Symbol(checkType, Decl(revertedIntersection.ts, 37, 5))
+>x : Symbol(x, Decl(revertedIntersection.ts, 39, 27))
+>y : Symbol(y, Decl(revertedIntersection.ts, 39, 37))
+
+  x: 1 as number,
+>x : Symbol(x, Decl(revertedIntersection.ts, 39, 53))
+
+  y: "y",
+>y : Symbol(y, Decl(revertedIntersection.ts, 40, 17))
+
+  z: "z", // undesirable property z is *not* allowed
+>z : Symbol(z, Decl(revertedIntersection.ts, 41, 9))
+
+});
+
+ checked;
+>checked : Symbol(checked, Decl(revertedIntersection.ts, 39, 5))
+
+  // ^?

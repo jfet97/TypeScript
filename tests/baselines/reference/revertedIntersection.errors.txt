@@ -1,8 +1,9 @@
 revertedIntersection.ts(19,7): error TS2322: Type '"bar"' is not assignable to type '"foo"'.
 revertedIntersection.ts(32,3): error TS2353: Object literal may only specify known properties, and 'extra' does not exist in type '{ entry: "foo"; states: { a: { entry: "foo"; }; }; }'.
+revertedIntersection.ts(43,3): error TS2353: Object literal may only specify known properties, and 'z' does not exist in type '{ x: number; y: "y"; }'.
 
 
-==== revertedIntersection.ts (2 errors) ====
+==== revertedIntersection.ts (3 errors) ====
     type StateConfig<TAction extends string> = {
       entry?: TAction
       states?: Record<string, StateConfig<TAction>>;
@@ -41,3 +42,19 @@ revertedIntersection.ts(32,3): error TS2353: Object literal may only specify kno
       ~~~~~
 !!! error TS2353: Object literal may only specify known properties, and 'extra' does not exist in type '{ entry: "foo"; states: { a: { entry: "foo"; }; }; }'.
     });
+    
+    
+    // -----------------------------------------------------------------------------------------
+    
+    const checkType = <T>() => <U extends T>(value: { [K in keyof U & keyof T]: U[K]}) => value;
+    
+    const checked = checkType<{x: number, y: string}>()({
+      x: 1 as number,
+      y: "y",
+      z: "z", // undesirable property z is *not* allowed
+      ~
+!!! error TS2353: Object literal may only specify known properties, and 'z' does not exist in type '{ x: number; y: "y"; }'.
+    });
+    
+     checked;
+      // ^?
