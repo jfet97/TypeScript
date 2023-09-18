@@ -56,9 +56,25 @@ interface Stuff {
     anotherField: string;
 }
 
-declare function doStuffWithStuff<T extends Stuff>(arr: { [K in keyof T & keyof Stuff]: T[K] }[]): T
+function doStuffWithStuff<T extends Stuff>(s: { [K in keyof T & keyof Stuff]: T[K] } ): T {
+    if(Math.random() > 0.5) {
+      return s as T
+    } else {
+      return s
+    }
+}
 
-doStuffWithStuff([
+doStuffWithStuff({ field: 1, anotherField: 'a', extra: 123 })
+
+function doStuffWithStuffArr<T extends Stuff>(arr: { [K in keyof T & keyof Stuff]: T[K] }[]): T[] {
+    if(Math.random() > 0.5) {
+      return arr as T[]
+    } else {
+      return arr
+    }
+}
+
+doStuffWithStuffArr([
     { field: 1, anotherField: 'a', extra: 123 },
 ])
 
@@ -90,6 +106,23 @@ var checked = checkType()({
     z: "z", // undesirable property z is *not* allowed
 });
 checked;
-doStuffWithStuff([
+function doStuffWithStuff(s) {
+    if (Math.random() > 0.5) {
+        return s;
+    }
+    else {
+        return s;
+    }
+}
+doStuffWithStuff({ field: 1, anotherField: 'a', extra: 123 });
+function doStuffWithStuffArr(arr) {
+    if (Math.random() > 0.5) {
+        return arr;
+    }
+    else {
+        return arr;
+    }
+}
+doStuffWithStuffArr([
     { field: 1, anotherField: 'a', extra: 123 },
 ]);

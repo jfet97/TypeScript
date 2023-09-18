@@ -147,25 +147,73 @@ interface Stuff {
 >anotherField : Symbol(Stuff.anotherField, Decl(revertedIntersection.ts, 51, 18))
 }
 
-declare function doStuffWithStuff<T extends Stuff>(arr: { [K in keyof T & keyof Stuff]: T[K] }[]): T
+function doStuffWithStuff<T extends Stuff>(s: { [K in keyof T & keyof Stuff]: T[K] } ): T {
 >doStuffWithStuff : Symbol(doStuffWithStuff, Decl(revertedIntersection.ts, 53, 1))
->T : Symbol(T, Decl(revertedIntersection.ts, 55, 34))
+>T : Symbol(T, Decl(revertedIntersection.ts, 55, 26))
 >Stuff : Symbol(Stuff, Decl(revertedIntersection.ts, 45, 8))
->arr : Symbol(arr, Decl(revertedIntersection.ts, 55, 51))
->K : Symbol(K, Decl(revertedIntersection.ts, 55, 59))
->T : Symbol(T, Decl(revertedIntersection.ts, 55, 34))
+>s : Symbol(s, Decl(revertedIntersection.ts, 55, 43))
+>K : Symbol(K, Decl(revertedIntersection.ts, 55, 49))
+>T : Symbol(T, Decl(revertedIntersection.ts, 55, 26))
 >Stuff : Symbol(Stuff, Decl(revertedIntersection.ts, 45, 8))
->T : Symbol(T, Decl(revertedIntersection.ts, 55, 34))
->K : Symbol(K, Decl(revertedIntersection.ts, 55, 59))
->T : Symbol(T, Decl(revertedIntersection.ts, 55, 34))
+>T : Symbol(T, Decl(revertedIntersection.ts, 55, 26))
+>K : Symbol(K, Decl(revertedIntersection.ts, 55, 49))
+>T : Symbol(T, Decl(revertedIntersection.ts, 55, 26))
 
-doStuffWithStuff([
+    if(Math.random() > 0.5) {
+>Math.random : Symbol(Math.random, Decl(lib.es5.d.ts, --, --))
+>Math : Symbol(Math, Decl(lib.es5.d.ts, --, --), Decl(lib.es5.d.ts, --, --))
+>random : Symbol(Math.random, Decl(lib.es5.d.ts, --, --))
+
+      return s as T
+>s : Symbol(s, Decl(revertedIntersection.ts, 55, 43))
+>T : Symbol(T, Decl(revertedIntersection.ts, 55, 26))
+
+    } else {
+      return s
+>s : Symbol(s, Decl(revertedIntersection.ts, 55, 43))
+    }
+}
+
+doStuffWithStuff({ field: 1, anotherField: 'a', extra: 123 })
 >doStuffWithStuff : Symbol(doStuffWithStuff, Decl(revertedIntersection.ts, 53, 1))
+>field : Symbol(field, Decl(revertedIntersection.ts, 63, 18))
+>anotherField : Symbol(anotherField, Decl(revertedIntersection.ts, 63, 28))
+>extra : Symbol(extra, Decl(revertedIntersection.ts, 63, 47))
+
+function doStuffWithStuffArr<T extends Stuff>(arr: { [K in keyof T & keyof Stuff]: T[K] }[]): T[] {
+>doStuffWithStuffArr : Symbol(doStuffWithStuffArr, Decl(revertedIntersection.ts, 63, 61))
+>T : Symbol(T, Decl(revertedIntersection.ts, 65, 29))
+>Stuff : Symbol(Stuff, Decl(revertedIntersection.ts, 45, 8))
+>arr : Symbol(arr, Decl(revertedIntersection.ts, 65, 46))
+>K : Symbol(K, Decl(revertedIntersection.ts, 65, 54))
+>T : Symbol(T, Decl(revertedIntersection.ts, 65, 29))
+>Stuff : Symbol(Stuff, Decl(revertedIntersection.ts, 45, 8))
+>T : Symbol(T, Decl(revertedIntersection.ts, 65, 29))
+>K : Symbol(K, Decl(revertedIntersection.ts, 65, 54))
+>T : Symbol(T, Decl(revertedIntersection.ts, 65, 29))
+
+    if(Math.random() > 0.5) {
+>Math.random : Symbol(Math.random, Decl(lib.es5.d.ts, --, --))
+>Math : Symbol(Math, Decl(lib.es5.d.ts, --, --), Decl(lib.es5.d.ts, --, --))
+>random : Symbol(Math.random, Decl(lib.es5.d.ts, --, --))
+
+      return arr as T[]
+>arr : Symbol(arr, Decl(revertedIntersection.ts, 65, 46))
+>T : Symbol(T, Decl(revertedIntersection.ts, 65, 29))
+
+    } else {
+      return arr
+>arr : Symbol(arr, Decl(revertedIntersection.ts, 65, 46))
+    }
+}
+
+doStuffWithStuffArr([
+>doStuffWithStuffArr : Symbol(doStuffWithStuffArr, Decl(revertedIntersection.ts, 63, 61))
 
     { field: 1, anotherField: 'a', extra: 123 },
->field : Symbol(field, Decl(revertedIntersection.ts, 58, 5))
->anotherField : Symbol(anotherField, Decl(revertedIntersection.ts, 58, 15))
->extra : Symbol(extra, Decl(revertedIntersection.ts, 58, 34))
+>field : Symbol(field, Decl(revertedIntersection.ts, 74, 5))
+>anotherField : Symbol(anotherField, Decl(revertedIntersection.ts, 74, 15))
+>extra : Symbol(extra, Decl(revertedIntersection.ts, 74, 34))
 
 ])
 

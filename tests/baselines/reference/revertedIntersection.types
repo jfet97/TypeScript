@@ -137,13 +137,64 @@ interface Stuff {
 >anotherField : string
 }
 
-declare function doStuffWithStuff<T extends Stuff>(arr: { [K in keyof T & keyof Stuff]: T[K] }[]): T
->doStuffWithStuff : <T extends Stuff>(arr: { [K in keyof T & keyof Stuff]: T[K]; }[]) => T
+function doStuffWithStuff<T extends Stuff>(s: { [K in keyof T & keyof Stuff]: T[K] } ): T {
+>doStuffWithStuff : <T extends Stuff>(s: { [K in keyof T & keyof Stuff]: T[K]; }) => T
+>s : { [K in keyof T & keyof Stuff]: T[K]; }
+
+    if(Math.random() > 0.5) {
+>Math.random() > 0.5 : boolean
+>Math.random() : number
+>Math.random : () => number
+>Math : Math
+>random : () => number
+>0.5 : 0.5
+
+      return s as T
+>s as T : T
+>s : { [K in keyof T & keyof Stuff]: T[K]; }
+
+    } else {
+      return s
+>s : { [K in keyof T & keyof Stuff]: T[K]; }
+    }
+}
+
+doStuffWithStuff({ field: 1, anotherField: 'a', extra: 123 })
+>doStuffWithStuff({ field: 1, anotherField: 'a', extra: 123 }) : { field: 1; anotherField: "a"; extra: number; }
+>doStuffWithStuff : <T extends Stuff>(s: { [K in keyof T & keyof Stuff]: T[K]; }) => T
+>{ field: 1, anotherField: 'a', extra: 123 } : { field: 1; anotherField: "a"; extra: number; }
+>field : 1
+>1 : 1
+>anotherField : "a"
+>'a' : "a"
+>extra : number
+>123 : 123
+
+function doStuffWithStuffArr<T extends Stuff>(arr: { [K in keyof T & keyof Stuff]: T[K] }[]): T[] {
+>doStuffWithStuffArr : <T extends Stuff>(arr: { [K in keyof T & keyof Stuff]: T[K]; }[]) => T[]
 >arr : { [K in keyof T & keyof Stuff]: T[K]; }[]
 
-doStuffWithStuff([
->doStuffWithStuff([    { field: 1, anotherField: 'a', extra: 123 },]) : { field: 1; anotherField: "a"; extra: number; }
->doStuffWithStuff : <T extends Stuff>(arr: { [K in keyof T & keyof Stuff]: T[K]; }[]) => T
+    if(Math.random() > 0.5) {
+>Math.random() > 0.5 : boolean
+>Math.random() : number
+>Math.random : () => number
+>Math : Math
+>random : () => number
+>0.5 : 0.5
+
+      return arr as T[]
+>arr as T[] : T[]
+>arr : { [K in keyof T & keyof Stuff]: T[K]; }[]
+
+    } else {
+      return arr
+>arr : { [K in keyof T & keyof Stuff]: T[K]; }[]
+    }
+}
+
+doStuffWithStuffArr([
+>doStuffWithStuffArr([    { field: 1, anotherField: 'a', extra: 123 },]) : { field: 1; anotherField: "a"; extra: number; }[]
+>doStuffWithStuffArr : <T extends Stuff>(arr: { [K in keyof T & keyof Stuff]: T[K]; }[]) => T[]
 >[    { field: 1, anotherField: 'a', extra: 123 },] : { field: 1; anotherField: "a"; extra: number; }[]
 
     { field: 1, anotherField: 'a', extra: 123 },
