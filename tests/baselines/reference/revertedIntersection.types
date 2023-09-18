@@ -1,0 +1,89 @@
+//// [tests/cases/compiler/revertedIntersection.ts] ////
+
+=== revertedIntersection.ts ===
+type StateConfig<TAction extends string> = {
+>StateConfig : StateConfig<TAction>
+
+  entry?: TAction
+>entry : TAction
+
+  states?: Record<string, StateConfig<TAction>>;
+>states : Record<string, StateConfig<TAction>>
+
+};
+
+type StateSchema = {
+>StateSchema : { states?: Record<string, StateSchema>; }
+
+  states?: Record<string, StateSchema>;
+>states : Record<string, StateSchema>
+
+};
+
+declare function createMachine<
+>createMachine : <TConfig extends StateConfig<TAction>, TAction extends string = TConfig["entry"] extends string ? TConfig["entry"] : string>(config: { [K in keyof TConfig & keyof StateConfig<TAction>]: TConfig[K]; }) => [TAction, TConfig]
+
+  TConfig extends StateConfig<TAction>,
+  TAction extends string = TConfig["entry"] extends string ? TConfig["entry"] : string,
+>(config: { [K in keyof TConfig & keyof StateConfig<TAction>]: TConfig[K] }): [TAction, TConfig];
+>config : { [K in keyof TConfig & keyof StateConfig<TAction>]: TConfig[K]; }
+
+const inferredParams1 = createMachine({
+>inferredParams1 : ["foo", StateConfig<"foo">]
+>createMachine({  entry: "foo",  states: {    a: {      entry: "bar",    },  },  extra: 12,}) : ["foo", StateConfig<"foo">]
+>createMachine : <TConfig extends StateConfig<TAction>, TAction extends string = TConfig["entry"] extends string ? TConfig["entry"] : string>(config: { [K in keyof TConfig & keyof StateConfig<TAction>]: TConfig[K]; }) => [TAction, TConfig]
+>{  entry: "foo",  states: {    a: {      entry: "bar",    },  },  extra: 12,} : { entry: "foo"; states: { a: { entry: "bar"; }; }; extra: number; }
+
+  entry: "foo",
+>entry : "foo"
+>"foo" : "foo"
+
+  states: {
+>states : { a: { entry: "bar"; }; }
+>{    a: {      entry: "bar",    },  } : { a: { entry: "bar"; }; }
+
+    a: {
+>a : { entry: "bar"; }
+>{      entry: "bar",    } : { entry: "bar"; }
+
+      entry: "bar",
+>entry : "bar"
+>"bar" : "bar"
+
+    },
+  },
+  extra: 12,
+>extra : number
+>12 : 12
+
+});
+
+const inferredParams2 = createMachine({
+>inferredParams2 : ["foo", { entry: "foo"; states: { a: { entry: "foo"; }; }; extra: number; }]
+>createMachine({  entry: "foo",  states: {    a: {      entry: "foo",    },  },  extra: 12,}) : ["foo", { entry: "foo"; states: { a: { entry: "foo"; }; }; extra: number; }]
+>createMachine : <TConfig extends StateConfig<TAction>, TAction extends string = TConfig["entry"] extends string ? TConfig["entry"] : string>(config: { [K in keyof TConfig & keyof StateConfig<TAction>]: TConfig[K]; }) => [TAction, TConfig]
+>{  entry: "foo",  states: {    a: {      entry: "foo",    },  },  extra: 12,} : { entry: "foo"; states: { a: { entry: "foo"; }; }; extra: number; }
+
+  entry: "foo",
+>entry : "foo"
+>"foo" : "foo"
+
+  states: {
+>states : { a: { entry: "foo"; }; }
+>{    a: {      entry: "foo",    },  } : { a: { entry: "foo"; }; }
+
+    a: {
+>a : { entry: "foo"; }
+>{      entry: "foo",    } : { entry: "foo"; }
+
+      entry: "foo",
+>entry : "foo"
+>"foo" : "foo"
+
+    },
+  },
+  extra: 12,
+>extra : number
+>12 : 12
+
+});

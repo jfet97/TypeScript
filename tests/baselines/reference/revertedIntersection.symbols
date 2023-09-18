@@ -1,0 +1,98 @@
+//// [tests/cases/compiler/revertedIntersection.ts] ////
+
+=== revertedIntersection.ts ===
+type StateConfig<TAction extends string> = {
+>StateConfig : Symbol(StateConfig, Decl(revertedIntersection.ts, 0, 0))
+>TAction : Symbol(TAction, Decl(revertedIntersection.ts, 0, 17))
+
+  entry?: TAction
+>entry : Symbol(entry, Decl(revertedIntersection.ts, 0, 44))
+>TAction : Symbol(TAction, Decl(revertedIntersection.ts, 0, 17))
+
+  states?: Record<string, StateConfig<TAction>>;
+>states : Symbol(states, Decl(revertedIntersection.ts, 1, 17))
+>Record : Symbol(Record, Decl(lib.es5.d.ts, --, --))
+>StateConfig : Symbol(StateConfig, Decl(revertedIntersection.ts, 0, 0))
+>TAction : Symbol(TAction, Decl(revertedIntersection.ts, 0, 17))
+
+};
+
+type StateSchema = {
+>StateSchema : Symbol(StateSchema, Decl(revertedIntersection.ts, 3, 2))
+
+  states?: Record<string, StateSchema>;
+>states : Symbol(states, Decl(revertedIntersection.ts, 5, 20))
+>Record : Symbol(Record, Decl(lib.es5.d.ts, --, --))
+>StateSchema : Symbol(StateSchema, Decl(revertedIntersection.ts, 3, 2))
+
+};
+
+declare function createMachine<
+>createMachine : Symbol(createMachine, Decl(revertedIntersection.ts, 7, 2))
+
+  TConfig extends StateConfig<TAction>,
+>TConfig : Symbol(TConfig, Decl(revertedIntersection.ts, 9, 31))
+>StateConfig : Symbol(StateConfig, Decl(revertedIntersection.ts, 0, 0))
+>TAction : Symbol(TAction, Decl(revertedIntersection.ts, 10, 39))
+
+  TAction extends string = TConfig["entry"] extends string ? TConfig["entry"] : string,
+>TAction : Symbol(TAction, Decl(revertedIntersection.ts, 10, 39))
+>TConfig : Symbol(TConfig, Decl(revertedIntersection.ts, 9, 31))
+>TConfig : Symbol(TConfig, Decl(revertedIntersection.ts, 9, 31))
+
+>(config: { [K in keyof TConfig & keyof StateConfig<TAction>]: TConfig[K] }): [TAction, TConfig];
+>config : Symbol(config, Decl(revertedIntersection.ts, 12, 2))
+>K : Symbol(K, Decl(revertedIntersection.ts, 12, 13))
+>TConfig : Symbol(TConfig, Decl(revertedIntersection.ts, 9, 31))
+>StateConfig : Symbol(StateConfig, Decl(revertedIntersection.ts, 0, 0))
+>TAction : Symbol(TAction, Decl(revertedIntersection.ts, 10, 39))
+>TConfig : Symbol(TConfig, Decl(revertedIntersection.ts, 9, 31))
+>K : Symbol(K, Decl(revertedIntersection.ts, 12, 13))
+>TAction : Symbol(TAction, Decl(revertedIntersection.ts, 10, 39))
+>TConfig : Symbol(TConfig, Decl(revertedIntersection.ts, 9, 31))
+
+const inferredParams1 = createMachine({
+>inferredParams1 : Symbol(inferredParams1, Decl(revertedIntersection.ts, 14, 5))
+>createMachine : Symbol(createMachine, Decl(revertedIntersection.ts, 7, 2))
+
+  entry: "foo",
+>entry : Symbol(entry, Decl(revertedIntersection.ts, 14, 39))
+
+  states: {
+>states : Symbol(states, Decl(revertedIntersection.ts, 15, 15))
+
+    a: {
+>a : Symbol(a, Decl(revertedIntersection.ts, 16, 11))
+
+      entry: "bar",
+>entry : Symbol(entry, Decl(revertedIntersection.ts, 17, 8))
+
+    },
+  },
+  extra: 12,
+>extra : Symbol(extra, Decl(revertedIntersection.ts, 20, 4))
+
+});
+
+const inferredParams2 = createMachine({
+>inferredParams2 : Symbol(inferredParams2, Decl(revertedIntersection.ts, 24, 5))
+>createMachine : Symbol(createMachine, Decl(revertedIntersection.ts, 7, 2))
+
+  entry: "foo",
+>entry : Symbol(entry, Decl(revertedIntersection.ts, 24, 39))
+
+  states: {
+>states : Symbol(states, Decl(revertedIntersection.ts, 25, 15))
+
+    a: {
+>a : Symbol(a, Decl(revertedIntersection.ts, 26, 11))
+
+      entry: "foo",
+>entry : Symbol(entry, Decl(revertedIntersection.ts, 27, 8))
+
+    },
+  },
+  extra: 12,
+>extra : Symbol(extra, Decl(revertedIntersection.ts, 30, 4))
+
+});
