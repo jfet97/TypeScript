@@ -5,18 +5,18 @@ type StateConfig<TAction extends string> = {
 >StateConfig : StateConfig<TAction>
 
   entry?: TAction
->entry : TAction
+>entry : TAction | undefined
 
   states?: Record<string, StateConfig<TAction>>;
->states : Record<string, StateConfig<TAction>>
+>states : Record<string, StateConfig<TAction>> | undefined
 
 };
 
 type StateSchema = {
->StateSchema : { states?: Record<string, StateSchema>; }
+>StateSchema : { states?: Record<string, StateSchema> | undefined; }
 
   states?: Record<string, StateSchema>;
->states : Record<string, StateSchema>
+>states : Record<string, StateSchema> | undefined
 
 };
 
@@ -207,4 +207,45 @@ doStuffWithStuffArr([
 >123 : 123
 
 ])
+
+// -----------------------------------------------------------------------------------------
+
+type XNumber = { x: number }
+>XNumber : { x: number; }
+>x : number
+
+declare function foo<T extends XNumber>(props: {[K in keyof T & keyof XNumber]: T[K]}): void;
+>foo : <T extends XNumber>(props: { [K in keyof T & "x"]: T[K]; }) => void
+>props : { [K in keyof T & "x"]: T[K]; }
+
+function bar(props: {x: number, y: string}) {
+>bar : (props: {    x: number;    y: string;}) => void
+>props : { x: number; y: string; }
+>x : number
+>y : string
+
+  return foo(props); // no error because lack of excess property check by design
+>foo(props) : void
+>foo : <T extends XNumber>(props: { [K in keyof T & "x"]: T[K]; }) => void
+>props : { x: number; y: string; }
+}
+
+foo({x: 1, y: 'foo'});
+>foo({x: 1, y: 'foo'}) : void
+>foo : <T extends XNumber>(props: { [K in keyof T & "x"]: T[K]; }) => void
+>{x: 1, y: 'foo'} : { x: 1; y: string; }
+>x : 1
+>1 : 1
+>y : string
+>'foo' : "foo"
+
+foo({...{x: 1, y: 'foo'}}); // no error because lack of excess property check by design
+>foo({...{x: 1, y: 'foo'}}) : void
+>foo : <T extends XNumber>(props: { [K in keyof T & "x"]: T[K]; }) => void
+>{...{x: 1, y: 'foo'}} : { x: 1; y: string; }
+>{x: 1, y: 'foo'} : { x: 1; y: string; }
+>x : 1
+>1 : 1
+>y : string
+>'foo' : "foo"
 

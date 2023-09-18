@@ -1,3 +1,5 @@
+// @strict: true
+
 type StateConfig<TAction extends string> = {
   entry?: TAction
   states?: Record<string, StateConfig<TAction>>;
@@ -74,3 +76,17 @@ function doStuffWithStuffArr<T extends Stuff>(arr: { [K in keyof T & keyof Stuff
 doStuffWithStuffArr([
     { field: 1, anotherField: 'a', extra: 123 },
 ])
+
+// -----------------------------------------------------------------------------------------
+
+type XNumber = { x: number }
+
+declare function foo<T extends XNumber>(props: {[K in keyof T & keyof XNumber]: T[K]}): void;
+
+function bar(props: {x: number, y: string}) {
+  return foo(props); // no error because lack of excess property check by design
+}
+
+foo({x: 1, y: 'foo'});
+
+foo({...{x: 1, y: 'foo'}}); // no error because lack of excess property check by design

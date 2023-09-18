@@ -8,9 +8,10 @@ revertedIntersection.ts(70,7): error TS2322: Type '{ [K in keyof T & keyof Stuff
   Type '{ [K in keyof T & keyof Stuff]: T[K]; }' is not assignable to type 'T'.
     '{ [K in keyof T & keyof Stuff]: T[K]; }' is assignable to the constraint of type 'T', but 'T' could be instantiated with a different subtype of constraint 'Stuff'.
 revertedIntersection.ts(75,36): error TS2353: Object literal may only specify known properties, and 'extra' does not exist in type '{ field: 1; anotherField: "a"; }'.
+revertedIntersection.ts(88,12): error TS2353: Object literal may only specify known properties, and 'y' does not exist in type '{ x: 1; }'.
 
 
-==== revertedIntersection.ts (7 errors) ====
+==== revertedIntersection.ts (8 errors) ====
     type StateConfig<TAction extends string> = {
       entry?: TAction
       states?: Record<string, StateConfig<TAction>>;
@@ -106,3 +107,18 @@ revertedIntersection.ts(75,36): error TS2353: Object literal may only specify kn
 !!! error TS2353: Object literal may only specify known properties, and 'extra' does not exist in type '{ field: 1; anotherField: "a"; }'.
     ])
     
+    // -----------------------------------------------------------------------------------------
+    
+    type XNumber = { x: number }
+    
+    declare function foo<T extends XNumber>(props: {[K in keyof T & keyof XNumber]: T[K]}): void;
+    
+    function bar(props: {x: number, y: string}) {
+      return foo(props); // no error because lack of excess property check by design
+    }
+    
+    foo({x: 1, y: 'foo'});
+               ~
+!!! error TS2353: Object literal may only specify known properties, and 'y' does not exist in type '{ x: 1; }'.
+    
+    foo({...{x: 1, y: 'foo'}}); // no error because lack of excess property check by design
