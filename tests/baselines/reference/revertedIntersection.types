@@ -59,8 +59,8 @@ const inferredParams1 = createMachine({
 });
 
 const inferredParams2 = createMachine({
->inferredParams2 : ["foo", { entry: "foo"; states: { a: { entry: "foo"; }; }; extra: number; }]
->createMachine({  entry: "foo",  states: {    a: {      entry: "foo",    },  },  extra: 12,}) : ["foo", { entry: "foo"; states: { a: { entry: "foo"; }; }; extra: number; }]
+>inferredParams2 : ["foo", { entry: "foo"; states: { a: { entry: "foo"; }; }; }]
+>createMachine({  entry: "foo",  states: {    a: {      entry: "foo",    },  },  extra: 12,}) : ["foo", { entry: "foo"; states: { a: { entry: "foo"; }; }; }]
 >createMachine : <TConfig extends StateConfig<TAction>, TAction extends string = TConfig["entry"] extends string ? TConfig["entry"] : string>(config: { [K in keyof TConfig & keyof StateConfig<TAction>]: TConfig[K]; }) => [TAction, TConfig]
 >{  entry: "foo",  states: {    a: {      entry: "foo",    },  },  extra: 12,} : { entry: "foo"; states: { a: { entry: "foo"; }; }; extra: number; }
 
@@ -160,7 +160,7 @@ function doStuffWithStuff<T extends Stuff>(s: { [K in keyof T & keyof Stuff]: T[
 }
 
 doStuffWithStuff({ field: 1, anotherField: 'a', extra: 123 })
->doStuffWithStuff({ field: 1, anotherField: 'a', extra: 123 }) : { field: 1; anotherField: "a"; extra: number; }
+>doStuffWithStuff({ field: 1, anotherField: 'a', extra: 123 }) : { field: 1; anotherField: "a"; }
 >doStuffWithStuff : <T extends Stuff>(s: { [K in keyof T & keyof Stuff]: T[K]; }) => T
 >{ field: 1, anotherField: 'a', extra: 123 } : { field: 1; anotherField: "a"; extra: number; }
 >field : 1
@@ -193,7 +193,7 @@ function doStuffWithStuffArr<T extends Stuff>(arr: { [K in keyof T & keyof Stuff
 }
 
 doStuffWithStuffArr([
->doStuffWithStuffArr([    { field: 1, anotherField: 'a', extra: 123 },]) : { field: 1; anotherField: "a"; extra: number; }[]
+>doStuffWithStuffArr([    { field: 1, anotherField: 'a', extra: 123 },]) : { field: 1; anotherField: "a"; }[]
 >doStuffWithStuffArr : <T extends Stuff>(arr: { [K in keyof T & keyof Stuff]: T[K]; }[]) => T[]
 >[    { field: 1, anotherField: 'a', extra: 123 },] : { field: 1; anotherField: "a"; extra: number; }[]
 
