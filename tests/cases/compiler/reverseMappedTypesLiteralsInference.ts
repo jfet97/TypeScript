@@ -11,7 +11,7 @@ interface WithNestedPropd {
 declare function withNestedPropd<T extends WithNestedPropd>(props: { [K in keyof T | keyof WithNestedPropd]: T[K] }): T;
 
 
-// things that now work as they should
+// ---------------------------------------- things that now work as they should ----------------------------------------
 
 const wnpd_test0 = withNestedPropd({
       // ^?
@@ -113,7 +113,7 @@ const wnpd_test9 = withNestedPropd({
   arr: [1,2,3]
 } as const);
 
-// things that still don't work
+// ---------------------------------------- things that still don't work ----------------------------------------
 
 const wnpd_test10 = withNestedPropd({
       // ^?
