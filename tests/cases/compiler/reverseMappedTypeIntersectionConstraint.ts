@@ -90,3 +90,17 @@ function bar(props: {x: number, y: string}) {
 foo({x: 1, y: 'foo'});
 
 foo({...{x: 1, y: 'foo'}}); // no error because lack of excess property check by design
+
+// -----------------------------------------------------------------------------------------
+
+interface WithNestedProp {
+  prop: string;
+  nested: {
+    prop: string;
+  }
+}
+
+declare function withNestedProp<T extends WithNestedProp>(props: {[K in keyof T & keyof WithNestedProp]: T[K]}): T;
+
+const wnp = withNestedProp({prop: 'foo', nested: { prop: 'bar' }, extra: 10 });
+//    ^?
