@@ -93,6 +93,17 @@ foo({...{x: 1, y: 'foo'}}); // no error because lack of excess property check by
 
 // -----------------------------------------------------------------------------------------
 
+type NoErrWithOptProps = { x: number, y?: string }
+
+declare function baz<T extends NoErrWithOptProps>(props: {[K in keyof T & keyof NoErrWithOptProps]: T[K]}): void;
+
+baz({x: 1});
+baz({x: 1, z: 123});
+baz({x: 1, y: 'foo'});
+baz({x: 1, y: 'foo', z: 123});
+
+// -----------------------------------------------------------------------------------------
+
 interface WithNestedProp {
   prop: string;
   nested: {

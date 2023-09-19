@@ -251,6 +251,53 @@ foo({...{x: 1, y: 'foo'}}); // no error because lack of excess property check by
 
 // -----------------------------------------------------------------------------------------
 
+type NoErrWithOptProps = { x: number, y?: string }
+>NoErrWithOptProps : { x: number; y?: string | undefined; }
+>x : number
+>y : string | undefined
+
+declare function baz<T extends NoErrWithOptProps>(props: {[K in keyof T & keyof NoErrWithOptProps]: T[K]}): void;
+>baz : <T extends NoErrWithOptProps>(props: { [K in keyof T & keyof NoErrWithOptProps]: T[K]; }) => void
+>props : { [K in keyof T & keyof NoErrWithOptProps]: T[K]; }
+
+baz({x: 1});
+>baz({x: 1}) : void
+>baz : <T extends NoErrWithOptProps>(props: { [K in keyof T & keyof NoErrWithOptProps]: T[K]; }) => void
+>{x: 1} : { x: 1; }
+>x : 1
+>1 : 1
+
+baz({x: 1, z: 123});
+>baz({x: 1, z: 123}) : void
+>baz : <T extends NoErrWithOptProps>(props: { [K in keyof T & keyof NoErrWithOptProps]: T[K]; }) => void
+>{x: 1, z: 123} : { x: 1; z: number; }
+>x : 1
+>1 : 1
+>z : number
+>123 : 123
+
+baz({x: 1, y: 'foo'});
+>baz({x: 1, y: 'foo'}) : void
+>baz : <T extends NoErrWithOptProps>(props: { [K in keyof T & keyof NoErrWithOptProps]: T[K]; }) => void
+>{x: 1, y: 'foo'} : { x: 1; y: "foo"; }
+>x : 1
+>1 : 1
+>y : "foo"
+>'foo' : "foo"
+
+baz({x: 1, y: 'foo', z: 123});
+>baz({x: 1, y: 'foo', z: 123}) : void
+>baz : <T extends NoErrWithOptProps>(props: { [K in keyof T & keyof NoErrWithOptProps]: T[K]; }) => void
+>{x: 1, y: 'foo', z: 123} : { x: 1; y: "foo"; z: number; }
+>x : 1
+>1 : 1
+>y : "foo"
+>'foo' : "foo"
+>z : number
+>123 : 123
+
+// -----------------------------------------------------------------------------------------
+
 interface WithNestedProp {
   prop: string;
 >prop : string
