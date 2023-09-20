@@ -12,7 +12,7 @@ type StateSchema = {
 declare function createMachine<
   TConfig extends StateConfig<TAction>,
   TAction extends string = TConfig["entry"] extends string ? TConfig["entry"] : string,
->(config: { [K in keyof TConfig & keyof StateConfig<TAction>]: TConfig[K] }): [TAction, TConfig];
+>(config: { [K in keyof TConfig & keyof StateConfig<any>]: TConfig[K] }): [TAction, TConfig];
 
 const inferredParams1 = createMachine({
   entry: "foo",
@@ -127,12 +127,6 @@ interface ProvidedActor {
   logic: () => Promise<unknown>;
 }
 
-interface InferenceSource<TActor extends ProvidedActor> {
-  types?: {
-    actors?: TActor;
-  };
-}
-
 type DistributeActors<TActor> = TActor extends { src: infer TSrc }
   ? {
       src: TSrc;
@@ -154,14 +148,14 @@ type NoExtra<T> = {
   [K in keyof T]: K extends keyof MachineConfig<any> ? T[K] : never
 }
 
-declare function createMachine2<
-  TConfig extends MachineConfig<TActor>,
+declare function createXMachine<
+  const TConfig extends MachineConfig<TActor>,
   TActor extends ProvidedActor = TConfig extends { types: { actors: ProvidedActor} } ? TConfig["types"]["actors"] : ProvidedActor,
 >(config: {[K in keyof MachineConfig<any> & keyof TConfig]: TConfig[K] }): TConfig;
 
 const child = () => Promise.resolve("foo");
 
-const config = createMachine2({
+const config = createXMachine({
    // ^?
   types: {} as {
     actors: {
@@ -173,13 +167,11 @@ const config = createMachine2({
     src: "str",
   },
   extra: 10
-});
+} as const);
 
-
-
-const config2 = createMachine2({
+const config2 = createXMachine({
   invoke: {
-    src: "whatever" as const,
+    src: "whatever",
   },
   extra: 10
 });
