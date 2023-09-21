@@ -13491,12 +13491,15 @@ export function createTypeChecker(host: TypeCheckerHost): TypeChecker {
         const optionalMask = modifiers & MappedTypeModifiers.IncludeOptional ? 0 : SymbolFlags.Optional;
         const indexInfos = indexInfo ? [createIndexInfo(stringType, inferReverseMappedType(indexInfo.type, type.mappedType, type.constraintType), readonlyMask && indexInfo.isReadonly)] : emptyArray;
         const members = createSymbolTable();
+        const isSourceInitializerConstAsserted = (type.source.symbol.valueDeclaration?.kind === SyntaxKind.ObjectLiteralExpression || type.source.symbol.valueDeclaration?.kind === SyntaxKind.ArrayLiteralExpression) && isConstAssertion((type.source.symbol.valueDeclaration as ObjectLiteralExpression | ArrayLiteralExpression).parent);
         for (const prop of getPropertiesOfType(type.source)) {
             const checkFlags = CheckFlags.ReverseMapped | (readonlyMask && isReadonlySymbol(prop) ? CheckFlags.Readonly : 0);
             const inferredProp = createSymbol(SymbolFlags.Property | prop.flags & optionalMask, prop.escapedName, checkFlags) as ReverseMappedSymbol;
+            const propType = getTypeOfSymbol(prop);
+            const isPropInitializerConstAsserted = prop.declarations?.[0]?.kind === SyntaxKind.PropertyAssignment && isConstAssertion((prop.declarations?.[0] as PropertyAssignment).initializer);
             inferredProp.declarations = prop.declarations;
             inferredProp.links.nameType = getSymbolLinks(prop).nameType;
-            inferredProp.links.propertyType = getTypeOfSymbol(prop);
+            inferredProp.links.propertyType = !isConstTypeVariable(type.constraintType.type) && !isSourceInitializerConstAsserted && !isPropInitializerConstAsserted ? getBaseTypeOfLiteralType(propType) : propType;
             if (
                 type.constraintType.type.flags & TypeFlags.IndexedAccess
                 && (type.constraintType.type as IndexedAccessType).objectType.flags & TypeFlags.TypeParameter
