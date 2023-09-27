@@ -1,0 +1,31 @@
+//// [tests/cases/compiler/000.ts] ////
+
+=== 000.ts ===
+type NewReturnType<T extends (...args: never) => any> = T extends (
+>NewReturnType : NewReturnType<T>
+>args : never
+
+  ...args: never
+>args : never
+
+) => infer R
+  ? R
+  : any;
+
+type Foo<D extends Record<string, unknown>> = {
+>Foo : Foo<D>
+
+  [P in keyof Record<string, unknown>]: "whatever" extends D ? 1 : 0
+};
+
+type T0 = ReturnType<<D extends Record<string, unknown>>(t: D) => Foo<D>>
+>T0 : Foo<Record<string, unknown>>
+>t : D
+
+  // ^?
+
+type T1 = NewReturnType<<D extends Record<string, unknown>>(t: D) => Foo<D>>
+>T1 : any
+>t : D
+
+  // ^?

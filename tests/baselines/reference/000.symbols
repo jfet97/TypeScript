@@ -1,0 +1,55 @@
+//// [tests/cases/compiler/000.ts] ////
+
+=== 000.ts ===
+type NewReturnType<T extends (...args: never) => any> = T extends (
+>NewReturnType : Symbol(NewReturnType, Decl(000.ts, 0, 0))
+>T : Symbol(T, Decl(000.ts, 0, 19))
+>args : Symbol(args, Decl(000.ts, 0, 30))
+>T : Symbol(T, Decl(000.ts, 0, 19))
+
+  ...args: never
+>args : Symbol(args, Decl(000.ts, 0, 67))
+
+) => infer R
+>R : Symbol(R, Decl(000.ts, 2, 10))
+
+  ? R
+>R : Symbol(R, Decl(000.ts, 2, 10))
+
+  : any;
+
+type Foo<D extends Record<string, unknown>> = {
+>Foo : Symbol(Foo, Decl(000.ts, 4, 8))
+>D : Symbol(D, Decl(000.ts, 6, 9))
+>Record : Symbol(Record, Decl(lib.es5.d.ts, --, --))
+
+  [P in keyof Record<string, unknown>]: "whatever" extends D ? 1 : 0
+>P : Symbol(P, Decl(000.ts, 7, 3))
+>Record : Symbol(Record, Decl(lib.es5.d.ts, --, --))
+>D : Symbol(D, Decl(000.ts, 6, 9))
+
+};
+
+type T0 = ReturnType<<D extends Record<string, unknown>>(t: D) => Foo<D>>
+>T0 : Symbol(T0, Decl(000.ts, 8, 2))
+>ReturnType : Symbol(ReturnType, Decl(lib.es5.d.ts, --, --))
+>D : Symbol(D, Decl(000.ts, 10, 22))
+>Record : Symbol(Record, Decl(lib.es5.d.ts, --, --))
+>t : Symbol(t, Decl(000.ts, 10, 57))
+>D : Symbol(D, Decl(000.ts, 10, 22))
+>Foo : Symbol(Foo, Decl(000.ts, 4, 8))
+>D : Symbol(D, Decl(000.ts, 10, 22))
+
+  // ^?
+
+type T1 = NewReturnType<<D extends Record<string, unknown>>(t: D) => Foo<D>>
+>T1 : Symbol(T1, Decl(000.ts, 10, 73))
+>NewReturnType : Symbol(NewReturnType, Decl(000.ts, 0, 0))
+>D : Symbol(D, Decl(000.ts, 13, 25))
+>Record : Symbol(Record, Decl(lib.es5.d.ts, --, --))
+>t : Symbol(t, Decl(000.ts, 13, 60))
+>D : Symbol(D, Decl(000.ts, 13, 25))
+>Foo : Symbol(Foo, Decl(000.ts, 4, 8))
+>D : Symbol(D, Decl(000.ts, 13, 25))
+
+  // ^?
