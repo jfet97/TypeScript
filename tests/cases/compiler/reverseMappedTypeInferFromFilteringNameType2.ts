@@ -148,3 +148,24 @@ const config2 = createXMachine({
   },
   extra: 10,
 });
+
+
+type Bombolo<T> = {
+    [
+      K in keyof T as K extends 'enabled'
+      ? K
+      : 'enabled' extends keyof T
+        ? T["enabled"] extends true
+          ? K
+          : never
+        : never
+    ]: T[K]
+}
+
+
+declare function bombolo<T>(a: Bombolo<T>): T
+
+bombolo({ a: "a", b: "b", c: "c", enabled: false as const})
+bombolo({ a: "a", b: "b", c: "c", enabled: true as const})
+
+bombolo({ a: "a", b: "b", c: "c"}) // no epc?

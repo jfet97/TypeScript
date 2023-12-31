@@ -447,3 +447,64 @@ const config2 = createXMachine({
 
 });
 
+
+type Bombolo<T> = {
+>Bombolo : Bombolo<T>
+
+    [
+      K in keyof T as K extends 'enabled'
+      ? K
+      : 'enabled' extends keyof T
+        ? T["enabled"] extends true
+>true : true
+
+          ? K
+          : never
+        : never
+    ]: T[K]
+}
+
+
+declare function bombolo<T>(a: Bombolo<T>): T
+>bombolo : <T>(a: Bombolo<T>) => T
+>a : Bombolo<T>
+
+bombolo({ a: "a", b: "b", c: "c", enabled: false as const})
+>bombolo({ a: "a", b: "b", c: "c", enabled: false as const}) : { enabled: false; }
+>bombolo : <T>(a: Bombolo<T>) => T
+>{ a: "a", b: "b", c: "c", enabled: false as const} : { a: string; b: string; c: string; enabled: false; }
+>a : string
+>"a" : "a"
+>b : string
+>"b" : "b"
+>c : string
+>"c" : "c"
+>enabled : false
+>false as const : false
+>false : false
+
+bombolo({ a: "a", b: "b", c: "c", enabled: true as const})
+>bombolo({ a: "a", b: "b", c: "c", enabled: true as const}) : { a: string; b: string; c: string; enabled: true; }
+>bombolo : <T>(a: Bombolo<T>) => T
+>{ a: "a", b: "b", c: "c", enabled: true as const} : { a: string; b: string; c: string; enabled: true; }
+>a : string
+>"a" : "a"
+>b : string
+>"b" : "b"
+>c : string
+>"c" : "c"
+>enabled : true
+>true as const : true
+>true : true
+
+bombolo({ a: "a", b: "b", c: "c"}) // no epc?
+>bombolo({ a: "a", b: "b", c: "c"}) : {}
+>bombolo : <T>(a: Bombolo<T>) => T
+>{ a: "a", b: "b", c: "c"} : { a: string; b: string; c: string; }
+>a : string
+>"a" : "a"
+>b : string
+>"b" : "b"
+>c : string
+>"c" : "c"
+
