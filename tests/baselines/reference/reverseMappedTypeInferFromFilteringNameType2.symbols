@@ -544,9 +544,10 @@ bombolo({ a: "a", b: "b", c: "c", enabled: true as const})
 >enabled : Symbol(enabled, Decl(reverseMappedTypeInferFromFilteringNameType2.ts, 164, 33))
 >const : Symbol(const)
 
-bombolo({ a: "a", b: "b", c: "c"}) // no epc?
+// no excess property check because the parameter type turns out to be the empty object type {}
+bombolo({ a: "a", b: "b", c: "c"})
 >bombolo : Symbol(bombolo, Decl(reverseMappedTypeInferFromFilteringNameType2.ts, 158, 1))
->a : Symbol(a, Decl(reverseMappedTypeInferFromFilteringNameType2.ts, 166, 9))
->b : Symbol(b, Decl(reverseMappedTypeInferFromFilteringNameType2.ts, 166, 17))
->c : Symbol(c, Decl(reverseMappedTypeInferFromFilteringNameType2.ts, 166, 25))
+>a : Symbol(a, Decl(reverseMappedTypeInferFromFilteringNameType2.ts, 167, 9))
+>b : Symbol(b, Decl(reverseMappedTypeInferFromFilteringNameType2.ts, 167, 17))
+>c : Symbol(c, Decl(reverseMappedTypeInferFromFilteringNameType2.ts, 167, 25))
 

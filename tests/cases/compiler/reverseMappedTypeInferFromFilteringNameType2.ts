@@ -168,4 +168,5 @@ declare function bombolo<T>(a: Bombolo<T>): T
 bombolo({ a: "a", b: "b", c: "c", enabled: false as const})
 bombolo({ a: "a", b: "b", c: "c", enabled: true as const})
 
-bombolo({ a: "a", b: "b", c: "c"}) // no epc?
+// no excess property check because the parameter type turns out to be the empty object type {}
+bombolo({ a: "a", b: "b", c: "c"})

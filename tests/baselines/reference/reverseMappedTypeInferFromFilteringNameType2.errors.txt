@@ -216,4 +216,5 @@ reverseMappedTypeInferFromFilteringNameType2.ts(164,11): error TS2353: Object li
 !!! error TS2353: Object literal may only specify known properties, and 'a' does not exist in type 'Bombolo<{ enabled: false; }>'.
     bombolo({ a: "a", b: "b", c: "c", enabled: true as const})
     
-    bombolo({ a: "a", b: "b", c: "c"}) // no epc?
+    // no excess property check because the parameter type turns out to be the empty object type {}
+    bombolo({ a: "a", b: "b", c: "c"})
