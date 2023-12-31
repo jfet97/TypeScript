@@ -1,0 +1,16 @@
+//// [tests/cases/compiler/000.ts] ////
+
+=== 000.ts ===
+type test = { a: string } & { a: 5 }
+>test : Symbol(test, Decl(000.ts, 0, 0))
+>a : Symbol(a, Decl(000.ts, 0, 13))
+>a : Symbol(a, Decl(000.ts, 0, 29))
+
+declare const a: test
+>a : Symbol(a, Decl(000.ts, 2, 13))
+>test : Symbol(test, Decl(000.ts, 0, 0))
+
+let b = a
+>b : Symbol(b, Decl(000.ts, 4, 3))
+>a : Symbol(a, Decl(000.ts, 2, 13))
+

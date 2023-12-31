@@ -1,0 +1,15 @@
+//// [tests/cases/compiler/000.ts] ////
+
+=== 000.ts ===
+type test = { a: string } & { a: 5 }
+>test : never
+>a : string
+>a : 5
+
+declare const a: test
+>a : never
+
+let b = a
+>b : never
+>a : never
+
