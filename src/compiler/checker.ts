@@ -13693,8 +13693,9 @@ export function createTypeChecker(host: TypeCheckerHost): TypeChecker {
         const members = createSymbolTable();
         const limitedConstraint = getLimitedConstraint(type);
         const nameType = getNameTypeFromMappedType(type.mappedType);
+        const sourceProperties = getPropertiesOfType(type.source);
 
-        for (const prop of getPropertiesOfType(type.source)) {
+        for (const prop of sourceProperties) {
             const checkFlags = CheckFlags.ReverseMapped | (readonlyMask && isReadonlySymbol(prop) ? CheckFlags.Readonly : 0);
             const inferredProp = createSymbol(SymbolFlags.Property | prop.flags & optionalMask, prop.escapedName, checkFlags) as ReverseMappedSymbol;
             inferredProp.declarations = prop.declarations;
@@ -13722,9 +13723,9 @@ export function createTypeChecker(host: TypeCheckerHost): TypeChecker {
 
         setStructuredTypeMembers(type, members, emptyArray, emptyArray, indexInfos);
 
-        const propsToBeStrippedAway: __String[] = [];
+        const propsToBeStrippedAway: Set<__String> = new Set();
 
-        for (const prop of getPropertiesOfType(type.source)) {
+        for (const prop of sourceProperties) {
             // In case of a reverse mapped type with an intersection constraint or a name type
             // we skip those properties that are not assignable to them
             // because the extra properties wouldn't get through the application of the mapped type anyway
@@ -13733,14 +13734,14 @@ export function createTypeChecker(host: TypeCheckerHost): TypeChecker {
             if (limitedConstraint || nameType) {
                 const propertyNameType = getLiteralTypeFromProperty(prop, TypeFlags.StringOrNumberLiteralOrUnique);
                 if (limitedConstraint && !isTypeAssignableTo(propertyNameType, limitedConstraint)) {
-                    propsToBeStrippedAway.push(prop.escapedName);
+                    propsToBeStrippedAway.add(prop.escapedName);
                 }
                 if (nameType) {
                     const nameMapper = appendTypeMapping(type.mappedType.mapper, getTypeParameterFromMappedType(type.mappedType), propertyNameType);
                     const typeParameterMapper = appendTypeMapping(nameMapper, type.constraintType.type, type);
                     const instantiatedNameType = instantiateType(nameType, typeParameterMapper);
                     if (instantiatedNameType.flags & TypeFlags.Never) {
-                        propsToBeStrippedAway.push(prop.escapedName);
+                        propsToBeStrippedAway.add(prop.escapedName);
                     }
                 }
             }
