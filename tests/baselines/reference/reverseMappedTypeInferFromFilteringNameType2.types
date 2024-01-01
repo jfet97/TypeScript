@@ -509,3 +509,42 @@ bombolo({ a: "a", b: "b", c: "c"})
 >c : string
 >"c" : "c"
 
+
+// this is wrong: res should be { ok: "it's a string" } instead of {}
+// it's a bad idea using the source
+
+type Test<T> = {
+>Test : Test<T>
+
+    [K in keyof T as T[K] extends string ? K : never ]: { a: T[K] }
+>a : T[K]
+}
+
+declare function tst<T>(a: Test<T>): T
+>tst : <T>(a: Test<T>) => T
+>a : Test<T>
+
+const res = tst({
+>res : {}
+>tst({  ok: { a: "it's a string" },  not_ok: { a: 123 },}) : {}
+>tst : <T>(a: Test<T>) => T
+>{  ok: { a: "it's a string" },  not_ok: { a: 123 },} : { ok: { a: string; }; not_ok: { a: number; }; }
+
+  ok: { a: "it's a string" },
+>ok : { a: string; }
+>{ a: "it's a string" } : { a: string; }
+>a : string
+>"it's a string" : "it's a string"
+
+  not_ok: { a: 123 },
+>not_ok : { a: number; }
+>{ a: 123 } : { a: number; }
+>a : number
+>123 : 123
+
+})
+
+   res
+>res : {}
+
+// ^?
