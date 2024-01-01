@@ -13731,7 +13731,7 @@ export function createTypeChecker(host: TypeCheckerHost): TypeChecker {
             // because the extra properties wouldn't get through the application of the mapped type anyway
             //
             // We do this after having set all the properties because we may need the full reverse-inferred type
-            // while checking its properties, sort of a circular dependency
+            // while stripping away some of its properties, it's sort of a circular dependency
             // e.g. we need T[K] in { [K in keyof T as T[K] extends string ? K : never ]: { value: T[K] } }
             if (limitedConstraint || nameType) {
                 const propertyNameType = getLiteralTypeFromProperty(prop, TypeFlags.StringOrNumberLiteralOrUnique);
