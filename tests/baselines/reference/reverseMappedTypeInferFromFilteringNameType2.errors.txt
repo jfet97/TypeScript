@@ -15,7 +15,7 @@ reverseMappedTypeInferFromFilteringNameType2.ts(96,68): error TS2353: Object lit
 reverseMappedTypeInferFromFilteringNameType2.ts(139,3): error TS2353: Object literal may only specify known properties, and 'extra' does not exist in type '{ readonly types: { actors: { src: "str"; logic: () => Promise<string>; }; }; readonly invoke: { readonly src: "str"; }; }'.
 reverseMappedTypeInferFromFilteringNameType2.ts(145,3): error TS2353: Object literal may only specify known properties, and 'extra' does not exist in type '{ readonly invoke: { readonly src: "whatever"; }; }'.
 reverseMappedTypeInferFromFilteringNameType2.ts(164,11): error TS2353: Object literal may only specify known properties, and 'a' does not exist in type 'Bombolo<{ enabled: false; }>'.
-reverseMappedTypeInferFromFilteringNameType2.ts(182,3): error TS2353: Object literal may only specify known properties, and 'not_ok' does not exist in type 'Test<{ ok: string; }>'.
+reverseMappedTypeInferFromFilteringNameType2.ts(178,3): error TS2353: Object literal may only specify known properties, and 'not_ok' does not exist in type 'TestRecursiveReferenceToT<{ ok: "it's a string"; }>'.
 
 
 ==== reverseMappedTypeInferFromFilteringNameType2.ts (15 errors) ====
@@ -220,21 +220,17 @@ reverseMappedTypeInferFromFilteringNameType2.ts(182,3): error TS2353: Object lit
     // no excess property check because the parameter type turns out to be the empty object type {}
     bombolo({ a: "a", b: "b", c: "c"})
     
-    
-    // this is wrong: res should be { ok: "it's a string" } instead of {}
-    // it's a bad idea using the source
-    
-    type Test<T> = {
+    type TestRecursiveReferenceToT<T> = {
         [K in keyof T as T[K] extends string ? K : never ]: { a: T[K] }
     }
     
-    declare function tst<T>(a: Test<T>): T
+    declare function tstrcv<T>(a: TestRecursiveReferenceToT<T>): T
     
-    const res = tst({
-      ok: { a: "it's a string" },
+    const res = tstrcv({
+      ok: { a: "it's a string" } as const,
       not_ok: { a: 123 },
       ~~~~~~
-!!! error TS2353: Object literal may only specify known properties, and 'not_ok' does not exist in type 'Test<{ ok: string; }>'.
+!!! error TS2353: Object literal may only specify known properties, and 'not_ok' does not exist in type 'TestRecursiveReferenceToT<{ ok: "it's a string"; }>'.
     })
     
        res

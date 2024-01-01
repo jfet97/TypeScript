@@ -171,18 +171,14 @@ bombolo({ a: "a", b: "b", c: "c", enabled: true as const})
 // no excess property check because the parameter type turns out to be the empty object type {}
 bombolo({ a: "a", b: "b", c: "c"})
 
-
-// this is wrong: res should be { ok: "it's a string" } instead of {}
-// it's a bad idea using the source
-
-type Test<T> = {
+type TestRecursiveReferenceToT<T> = {
     [K in keyof T as T[K] extends string ? K : never ]: { a: T[K] }
 }
 
-declare function tst<T>(a: Test<T>): T
+declare function tstrcv<T>(a: TestRecursiveReferenceToT<T>): T
 
-const res = tst({
-  ok: { a: "it's a string" },
+const res = tstrcv({
+  ok: { a: "it's a string" } as const,
   not_ok: { a: 123 },
 })
 
