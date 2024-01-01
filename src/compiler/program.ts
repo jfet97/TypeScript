@@ -4,10 +4,8 @@ import {
     addRange,
     addRelatedInfo,
     append,
-    arrayFrom,
     arrayIsEqualTo,
     AsExpression,
-    AssertClause,
     BuilderProgram,
     CancellationToken,
     canHaveDecorators,
@@ -167,6 +165,7 @@ import {
     HeritageClause,
     Identifier,
     identity,
+    ImportAttributes,
     ImportClause,
     ImportDeclaration,
     ImportOrExportSpecifier,
@@ -215,7 +214,6 @@ import {
     LibResolution,
     libs,
     mapDefined,
-    mapDefinedIterator,
     maybeBind,
     memoize,
     MethodDeclaration,
@@ -864,7 +862,6 @@ export function getModeForResolutionAtIndex(file: SourceFile, index: number): Re
 // eslint-disable-next-line @typescript-eslint/unified-signatures
 export function getModeForResolutionAtIndex(file: SourceFileImportsList, index: number): ResolutionMode;
 export function getModeForResolutionAtIndex(file: SourceFileImportsList, index: number): ResolutionMode {
-    if (file.impliedNodeFormat === undefined) return undefined;
     // we ensure all elements of file.imports and file.moduleAugmentations have the relevant parent pointers set during program setup,
     // so it's safe to use them even pre-bind
     return getModeForUsageLocation(file, getModuleNameStringLiteralAt(file, index));
@@ -891,22 +888,22 @@ export function isExclusivelyTypeOnlyImportOrExport(decl: ImportDeclaration | Ex
  * @returns The final resolution mode of the import
  */
 export function getModeForUsageLocation(file: { impliedNodeFormat?: ResolutionMode; }, usage: StringLiteralLike) {
-    if (file.impliedNodeFormat === undefined) return undefined;
     if ((isImportDeclaration(usage.parent) || isExportDeclaration(usage.parent))) {
         const isTypeOnly = isExclusivelyTypeOnlyImportOrExport(usage.parent);
         if (isTypeOnly) {
-            const override = getResolutionModeOverrideForClause(usage.parent.assertClause);
+            const override = getResolutionModeOverride(usage.parent.attributes);
             if (override) {
                 return override;
             }
         }
     }
     if (usage.parent.parent && isImportTypeNode(usage.parent.parent)) {
-        const override = getResolutionModeOverrideForClause(usage.parent.parent.assertions?.assertClause);
+        const override = getResolutionModeOverride(usage.parent.parent.attributes);
         if (override) {
             return override;
         }
     }
+    if (file.impliedNodeFormat === undefined) return undefined;
     if (file.impliedNodeFormat !== ModuleKind.ESNext) {
         // in cjs files, import call expressions are esm format, otherwise everything is cjs
         return isImportCall(walkUpParenthesizedExpressions(usage.parent)) ? ModuleKind.ESNext : ModuleKind.CommonJS;
@@ -918,16 +915,26 @@ export function getModeForUsageLocation(file: { impliedNodeFormat?: ResolutionMo
 }
 
 /** @internal */
-export function getResolutionModeOverrideForClause(clause: AssertClause | undefined, grammarErrorOnNode?: (node: Node, diagnostic: DiagnosticMessage) => void) {
-    if (!clause) return undefined;
-    if (length(clause.elements) !== 1) {
-        grammarErrorOnNode?.(clause, Diagnostics.Type_import_assertions_should_have_exactly_one_key_resolution_mode_with_value_import_or_require);
+export function getResolutionModeOverride(node: ImportAttributes | undefined, grammarErrorOnNode?: (node: Node, diagnostic: DiagnosticMessage) => void) {
+    if (!node) return undefined;
+    if (length(node.elements) !== 1) {
+        grammarErrorOnNode?.(
+            node,
+            node.token === SyntaxKind.WithKeyword
+                ? Diagnostics.Type_import_attributes_should_have_exactly_one_key_resolution_mode_with_value_import_or_require
+                : Diagnostics.Type_import_assertions_should_have_exactly_one_key_resolution_mode_with_value_import_or_require,
+        );
         return undefined;
     }
-    const elem = clause.elements[0];
+    const elem = node.elements[0];
     if (!isStringLiteralLike(elem.name)) return undefined;
     if (elem.name.text !== "resolution-mode") {
-        grammarErrorOnNode?.(elem.name, Diagnostics.resolution_mode_is_the_only_valid_key_for_type_import_assertions);
+        grammarErrorOnNode?.(
+            elem.name,
+            node.token === SyntaxKind.WithKeyword
+                ? Diagnostics.resolution_mode_is_the_only_valid_key_for_type_import_attributes
+                : Diagnostics.resolution_mode_is_the_only_valid_key_for_type_import_assertions,
+        );
         return undefined;
     }
     if (!isStringLiteralLike(elem.value)) return undefined;
@@ -1229,7 +1236,8 @@ export function isProgramUptoDate(
     if (program.getSourceFiles().some(sourceFileNotUptoDate)) return false;
 
     // If any of the missing file paths are now created
-    if (program.getMissingFilePaths().some(fileExists)) return false;
+    const missingPaths = program.getMissingFilePaths();
+    if (missingPaths && forEachEntry(missingPaths, fileExists)) return false;
 
     const currentOptions = program.getCompilerOptions();
     // If the compilation settings do no match, then the program is not up-to-date
@@ -1393,7 +1401,7 @@ export const plainJSErrors = new Set<number>([
     Diagnostics.Classes_may_not_have_a_field_named_constructor.code,
     Diagnostics.Did_you_mean_to_use_a_Colon_An_can_only_follow_a_property_name_when_the_containing_object_literal_is_part_of_a_destructuring_pattern.code,
     Diagnostics.Duplicate_label_0.code,
-    Diagnostics.Dynamic_imports_can_only_accept_a_module_specifier_and_an_optional_assertion_as_arguments.code,
+    Diagnostics.Dynamic_imports_can_only_accept_a_module_specifier_and_an_optional_set_of_attributes_as_arguments.code,
     Diagnostics.for_await_loops_cannot_be_used_inside_a_class_static_block.code,
     Diagnostics.JSX_attributes_must_only_be_assigned_a_non_empty_expression.code,
     Diagnostics.JSX_elements_cannot_have_multiple_attributes_with_the_same_name.code,
@@ -1674,8 +1682,8 @@ export function createProgram(rootNamesOrOptions: readonly string[] | CreateProg
      * - false if sourceFile missing for source of project reference redirect
      * - undefined otherwise
      */
-    const filesByName = new Map<string, SourceFile | false | undefined>();
-    let missingFilePaths: readonly Path[] | undefined;
+    const filesByName = new Map<Path, SourceFile | false | undefined>();
+    let missingFileNames = new Map<Path, string>();
     // stores 'filename -> file association' ignoring case
     // used to track cases when two file names differ only in casing
     const filesByNameIgnoreCase = host.useCaseSensitiveFileNames() ? new Map<string, SourceFile>() : undefined;
@@ -1792,13 +1800,10 @@ export function createProgram(rootNamesOrOptions: readonly string[] | CreateProg
             }
         }
 
-        missingFilePaths = arrayFrom(mapDefinedIterator(filesByName.entries(), ([path, file]) => file === undefined ? path as Path : undefined));
         files = stableSort(processingDefaultLibFiles, compareDefaultLibFiles).concat(processingOtherFiles);
         processingDefaultLibFiles = undefined;
         processingOtherFiles = undefined;
     }
-
-    Debug.assert(!!missingFilePaths);
 
     // Release any files we have acquired in the old program but are
     // not part of the new program.
@@ -1849,7 +1854,7 @@ export function createProgram(rootNamesOrOptions: readonly string[] | CreateProg
         getSourceFile,
         getSourceFileByPath,
         getSourceFiles: () => files,
-        getMissingFilePaths: () => missingFilePaths!, // TODO: GH#18217
+        getMissingFilePaths: () => missingFileNames,
         getModuleResolutionCache: () => moduleResolutionCache,
         getFilesByNameMap: () => filesByName,
         getCompilerOptions: () => options,
@@ -2378,7 +2383,7 @@ export function createProgram(rootNamesOrOptions: readonly string[] | CreateProg
         // If the missing file paths are now present, it can change the progam structure,
         // and hence cant reuse the structure.
         // This is same as how we dont reuse the structure if one of the file from old program is now missing
-        if (oldProgram.getMissingFilePaths().some(missingFilePath => host.fileExists(missingFilePath))) {
+        if (forEachEntry(oldProgram.getMissingFilePaths(), missingFileName => host.fileExists(missingFileName))) {
             return StructureIsReused.Not;
         }
 
@@ -2559,7 +2564,7 @@ export function createProgram(rootNamesOrOptions: readonly string[] | CreateProg
             automaticTypeDirectiveNames = getAutomaticTypeDirectiveNames(options, host);
             if (!arrayIsEqualTo(oldProgram.getAutomaticTypeDirectiveNames(), automaticTypeDirectiveNames)) return StructureIsReused.SafeModules;
         }
-        missingFilePaths = oldProgram.getMissingFilePaths();
+        missingFileNames = oldProgram.getMissingFilePaths();
 
         // update fileName -> file mapping
         Debug.assert(newSourceFiles.length === oldProgram.getSourceFiles().length);
@@ -2623,7 +2628,7 @@ export function createProgram(rootNamesOrOptions: readonly string[] | CreateProg
                 // Use local caches
                 const path = toPath(f);
                 if (getSourceFileByPath(path)) return true;
-                if (contains(missingFilePaths, path)) return false;
+                if (missingFileNames.has(path)) return false;
                 // Before falling back to the host
                 return host.fileExists(f);
             },
@@ -3294,7 +3299,7 @@ export function createProgram(rootNamesOrOptions: readonly string[] | CreateProg
 
     function createSyntheticImport(text: string, file: SourceFile) {
         const externalHelpersModuleReference = factory.createStringLiteral(text);
-        const importDecl = factory.createImportDeclaration(/*modifiers*/ undefined, /*importClause*/ undefined, externalHelpersModuleReference, /*assertClause*/ undefined);
+        const importDecl = factory.createImportDeclaration(/*modifiers*/ undefined, /*importClause*/ undefined, externalHelpersModuleReference, /*attributes*/ undefined);
         addInternalEmitFlags(importDecl, InternalEmitFlags.NeverApplyImportHelper);
         setParent(externalHelpersModuleReference, importDecl);
         setParent(importDecl, file);
@@ -3582,7 +3587,7 @@ export function createProgram(rootNamesOrOptions: readonly string[] | CreateProg
                 const file = isString(source) ?
                     findSourceFile(source, isDefaultLib, ignoreNoDefaultLib, reason, packageId) :
                     undefined;
-                if (file) addFileToFilesByName(file, path, /*redirectedPath*/ undefined);
+                if (file) addFileToFilesByName(file, path, fileName, /*redirectedPath*/ undefined);
                 return file;
             }
         }
@@ -3668,7 +3673,7 @@ export function createProgram(rootNamesOrOptions: readonly string[] | CreateProg
                 // Instead of creating a duplicate, just redirect to the existing one.
                 const dupFile = createRedirectedSourceFile(fileFromPackageId, file!, fileName, path, toPath(fileName), originalFileName, sourceFileOptions);
                 redirectTargetsMap.add(fileFromPackageId.path, fileName);
-                addFileToFilesByName(dupFile, path, redirectedPath);
+                addFileToFilesByName(dupFile, path, fileName, redirectedPath);
                 addFileIncludeReason(dupFile, reason);
                 sourceFileToPackageName.set(path, packageIdToPackageName(packageId));
                 processingOtherFiles!.push(dupFile);
@@ -3680,7 +3685,7 @@ export function createProgram(rootNamesOrOptions: readonly string[] | CreateProg
                 sourceFileToPackageName.set(path, packageIdToPackageName(packageId));
             }
         }
-        addFileToFilesByName(file, path, redirectedPath);
+        addFileToFilesByName(file, path, fileName, redirectedPath);
 
         if (file) {
             sourceFilesFoundSearchingNodeModules.set(path, currentNodeModulesDepth > 0);
@@ -3731,14 +3736,19 @@ export function createProgram(rootNamesOrOptions: readonly string[] | CreateProg
         if (file) fileReasons.add(file.path, reason);
     }
 
-    function addFileToFilesByName(file: SourceFile | undefined, path: Path, redirectedPath: Path | undefined) {
+    function addFileToFilesByName(file: SourceFile | undefined, path: Path, fileName: string, redirectedPath: Path | undefined) {
         if (redirectedPath) {
-            filesByName.set(redirectedPath, file);
-            filesByName.set(path, file || false);
+            updateFilesByNameMap(fileName, redirectedPath, file);
+            updateFilesByNameMap(fileName, path, file || false);
         }
         else {
-            filesByName.set(path, file);
+            updateFilesByNameMap(fileName, path, file);
         }
+    }
+    function updateFilesByNameMap(fileName: string, path: Path, file: SourceFile | false | undefined) {
+        filesByName.set(path, file);
+        if (file !== undefined) missingFileNames.delete(path);
+        else missingFileNames.set(path, fileName);
     }
 
     function getProjectReferenceRedirect(fileName: string): string | undefined {
@@ -3852,14 +3862,6 @@ export function createProgram(rootNamesOrOptions: readonly string[] | CreateProg
             const fileName = toFileNameLowerCase(ref.fileName);
             resolutionsInFile.set(fileName, getModeForFileReference(ref, file.impliedNodeFormat), resolvedTypeReferenceDirective);
             const mode = ref.resolutionMode || file.impliedNodeFormat;
-            if (mode && getEmitModuleResolutionKind(options) !== ModuleResolutionKind.Node16 && getEmitModuleResolutionKind(options) !== ModuleResolutionKind.NodeNext) {
-                (fileProcessingDiagnostics ??= []).push({
-                    kind: FilePreprocessingDiagnosticsKind.ResolutionDiagnostics,
-                    diagnostics: [
-                        createDiagnosticForRange(file, ref, Diagnostics.resolution_mode_assertions_are_only_supported_when_moduleResolution_is_node16_or_nodenext),
-                    ],
-                });
-            }
             processTypeReferenceDirective(fileName, mode, resolvedTypeReferenceDirective, { kind: FileIncludeKind.TypeReferenceDirective, file: file.path, index });
         }
     }
@@ -4118,19 +4120,19 @@ export function createProgram(rootNamesOrOptions: readonly string[] | CreateProg
         if (host.getParsedCommandLine) {
             commandLine = host.getParsedCommandLine(refPath);
             if (!commandLine) {
-                addFileToFilesByName(/*file*/ undefined, sourceFilePath, /*redirectedPath*/ undefined);
+                addFileToFilesByName(/*file*/ undefined, sourceFilePath, refPath, /*redirectedPath*/ undefined);
                 projectReferenceRedirects.set(sourceFilePath, false);
                 return undefined;
             }
             sourceFile = Debug.checkDefined(commandLine.options.configFile);
             Debug.assert(!sourceFile.path || sourceFile.path === sourceFilePath);
-            addFileToFilesByName(sourceFile, sourceFilePath, /*redirectedPath*/ undefined);
+            addFileToFilesByName(sourceFile, sourceFilePath, refPath, /*redirectedPath*/ undefined);
         }
         else {
             // An absolute path pointing to the containing directory of the config file
             const basePath = getNormalizedAbsolutePath(getDirectoryPath(refPath), currentDirectory);
             sourceFile = host.getSourceFile(refPath, ScriptTarget.JSON) as JsonSourceFile | undefined;
-            addFileToFilesByName(sourceFile, sourceFilePath, /*redirectedPath*/ undefined);
+            addFileToFilesByName(sourceFile, sourceFilePath, refPath, /*redirectedPath*/ undefined);
             if (sourceFile === undefined) {
                 projectReferenceRedirects.set(sourceFilePath, false);
                 return undefined;
