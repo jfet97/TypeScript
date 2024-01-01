@@ -15,9 +15,10 @@ reverseMappedTypeInferFromFilteringNameType2.ts(96,68): error TS2353: Object lit
 reverseMappedTypeInferFromFilteringNameType2.ts(139,3): error TS2353: Object literal may only specify known properties, and 'extra' does not exist in type '{ readonly types: { actors: { src: "str"; logic: () => Promise<string>; }; }; readonly invoke: { readonly src: "str"; }; }'.
 reverseMappedTypeInferFromFilteringNameType2.ts(145,3): error TS2353: Object literal may only specify known properties, and 'extra' does not exist in type '{ readonly invoke: { readonly src: "whatever"; }; }'.
 reverseMappedTypeInferFromFilteringNameType2.ts(164,11): error TS2353: Object literal may only specify known properties, and 'a' does not exist in type 'Bombolo<{ enabled: false; }>'.
+reverseMappedTypeInferFromFilteringNameType2.ts(182,3): error TS2353: Object literal may only specify known properties, and 'not_ok' does not exist in type 'Test<{ ok: string; }>'.
 
 
-==== reverseMappedTypeInferFromFilteringNameType2.ts (14 errors) ====
+==== reverseMappedTypeInferFromFilteringNameType2.ts (15 errors) ====
     type StateConfig<TAction extends string> = {
       entry?: TAction;
       states?: Record<string, StateConfig<TAction>>;
@@ -232,6 +233,8 @@ reverseMappedTypeInferFromFilteringNameType2.ts(164,11): error TS2353: Object li
     const res = tst({
       ok: { a: "it's a string" },
       not_ok: { a: 123 },
+      ~~~~~~
+!!! error TS2353: Object literal may only specify known properties, and 'not_ok' does not exist in type 'Test<{ ok: string; }>'.
     })
     
        res

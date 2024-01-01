@@ -525,8 +525,8 @@ declare function tst<T>(a: Test<T>): T
 >a : Test<T>
 
 const res = tst({
->res : {}
->tst({  ok: { a: "it's a string" },  not_ok: { a: 123 },}) : {}
+>res : { ok: string; }
+>tst({  ok: { a: "it's a string" },  not_ok: { a: 123 },}) : { ok: string; }
 >tst : <T>(a: Test<T>) => T
 >{  ok: { a: "it's a string" },  not_ok: { a: 123 },} : { ok: { a: string; }; not_ok: { a: number; }; }
 
@@ -545,6 +545,6 @@ const res = tst({
 })
 
    res
->res : {}
+>res : { ok: string; }
 
 // ^?

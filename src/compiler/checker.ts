@@ -13695,23 +13695,6 @@ export function createTypeChecker(host: TypeCheckerHost): TypeChecker {
         const nameType = getNameTypeFromMappedType(type.mappedType);
 
         for (const prop of getPropertiesOfType(type.source)) {
-            // In case of a reverse mapped type with an intersection constraint or a name type
-            // we skip those properties that are not assignable to them
-            // because the extra properties wouldn't get through the application of the mapped type anyway
-            if (limitedConstraint || nameType) {
-                const propertyNameType = getLiteralTypeFromProperty(prop, TypeFlags.StringOrNumberLiteralOrUnique);
-                if (limitedConstraint && !isTypeAssignableTo(propertyNameType, limitedConstraint)) {
-                    continue;
-                }
-                if (nameType) {
-                    const nameMapper = appendTypeMapping(type.mappedType.mapper, getTypeParameterFromMappedType(type.mappedType), propertyNameType);
-                    const typeParameterMapper = appendTypeMapping(nameMapper, type.constraintType.type, type.source);
-                    const instantiatedNameType = instantiateType(nameType, typeParameterMapper);
-                    if (instantiatedNameType.flags & TypeFlags.Never) {
-                        continue;
-                    }
-                }
-            }
             const checkFlags = CheckFlags.ReverseMapped | (readonlyMask && isReadonlySymbol(prop) ? CheckFlags.Readonly : 0);
             const inferredProp = createSymbol(SymbolFlags.Property | prop.flags & optionalMask, prop.escapedName, checkFlags) as ReverseMappedSymbol;
             inferredProp.declarations = prop.declarations;
@@ -13736,6 +13719,37 @@ export function createTypeChecker(host: TypeCheckerHost): TypeChecker {
             }
             members.set(prop.escapedName, inferredProp);
         }
+
+        setStructuredTypeMembers(type, members, emptyArray, emptyArray, indexInfos);
+
+        const propsToBeStrippedAway: __String[] = [];
+
+        for (const prop of getPropertiesOfType(type.source)) {
+            // In case of a reverse mapped type with an intersection constraint or a name type
+            // we skip those properties that are not assignable to them
+            // because the extra properties wouldn't get through the application of the mapped type anyway
+            //
+            // We do this after because we need the full inferred T (this comment sucks, it's a TODO)
+            if (limitedConstraint || nameType) {
+                const propertyNameType = getLiteralTypeFromProperty(prop, TypeFlags.StringOrNumberLiteralOrUnique);
+                if (limitedConstraint && !isTypeAssignableTo(propertyNameType, limitedConstraint)) {
+                    propsToBeStrippedAway.push(prop.escapedName);
+                }
+                if (nameType) {
+                    const nameMapper = appendTypeMapping(type.mappedType.mapper, getTypeParameterFromMappedType(type.mappedType), propertyNameType);
+                    const typeParameterMapper = appendTypeMapping(nameMapper, type.constraintType.type, type);
+                    const instantiatedNameType = instantiateType(nameType, typeParameterMapper);
+                    if (instantiatedNameType.flags & TypeFlags.Never) {
+                        propsToBeStrippedAway.push(prop.escapedName);
+                    }
+                }
+            }
+        }
+
+        for (const propToStripAway of propsToBeStrippedAway) {
+            members.delete(propToStripAway);
+        }
+
         setStructuredTypeMembers(type, members, emptyArray, emptyArray, indexInfos);
     }
 
