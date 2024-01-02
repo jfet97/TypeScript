@@ -1,7 +1,7 @@
 // @strict: true
 
-type NewReturnType<T extends (...args: never) => any> = T extends (
-  ...args: never
+type NewReturnType<T extends (...args: any) => any> = T extends (
+  ...args: infer _
 ) => infer R
   ? R
   : any;
@@ -16,7 +16,9 @@ type Foo<D extends Record<string, unknown>> = {
 type T1 = NewReturnType<<D extends Record<string, unknown>>(t: D) => Foo<D>>
   // ^?
 
-// type T0 = ReturnType<<T>(t: T) => keyof T>
+type T0 = NewReturnType<<T>(t: T) => keyof T>
+
+type T2 = NewReturnType<(t: never) => "ciao">
 
 // const fn = <T extends FromKeys<never>>(t: T): Foo<keyof T> => {
 //   return Object.fromEntries(
