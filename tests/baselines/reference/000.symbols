@@ -1,0 +1,51 @@
+//// [tests/cases/compiler/000.ts] ////
+
+=== 000.ts ===
+function func<
+>func : Symbol(func, Decl(000.ts, 0, 0))
+
+    T1,
+>T1 : Symbol(T1, Decl(000.ts, 0, 14))
+
+    T2 extends (context: T1) => void,
+>T2 : Symbol(T2, Decl(000.ts, 1, 7))
+>context : Symbol(context, Decl(000.ts, 2, 16))
+>T1 : Symbol(T1, Decl(000.ts, 0, 14))
+
+    T3 = {},
+>T3 : Symbol(T3, Decl(000.ts, 2, 37))
+
+>(data: {
+>data : Symbol(data, Decl(000.ts, 4, 2))
+
+    T1: T1;
+>T1 : Symbol(T1, Decl(000.ts, 4, 9))
+>T1 : Symbol(T1, Decl(000.ts, 0, 14))
+
+    T2: T2
+>T2 : Symbol(T2, Decl(000.ts, 5, 11))
+>T2 : Symbol(T2, Decl(000.ts, 1, 7))
+
+}) {
+}
+
+func({
+>func : Symbol(func, Decl(000.ts, 0, 0))
+
+    T1: {
+>T1 : Symbol(T1, Decl(000.ts, 10, 6))
+
+        aaa(){ return 333; },
+>aaa : Symbol(aaa, Decl(000.ts, 11, 9))
+
+    },
+    T2: (context) => {
+>T2 : Symbol(T2, Decl(000.ts, 13, 6))
+>context : Symbol(context, Decl(000.ts, 14, 9))
+
+        context.aaa();
+>context.aaa : Symbol(aaa, Decl(000.ts, 11, 9))
+>context : Symbol(context, Decl(000.ts, 14, 9))
+>aaa : Symbol(aaa, Decl(000.ts, 11, 9))
+    }
+});

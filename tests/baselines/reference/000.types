@@ -1,0 +1,49 @@
+//// [tests/cases/compiler/000.ts] ////
+
+=== 000.ts ===
+function func<
+>func : <T1, T2 extends (context: T1) => void, T3 = {}>(data: {    T1: T1;    T2: T2;}) => void
+
+    T1,
+    T2 extends (context: T1) => void,
+>context : T1
+
+    T3 = {},
+>(data: {
+>data : { T1: T1; T2: T2; }
+
+    T1: T1;
+>T1 : T1
+
+    T2: T2
+>T2 : T2
+
+}) {
+}
+
+func({
+>func({    T1: {        aaa(){ return 333; },    },    T2: (context) => {        context.aaa();    }}) : void
+>func : <T1, T2 extends (context: T1) => void, T3 = {}>(data: { T1: T1; T2: T2; }) => void
+>{    T1: {        aaa(){ return 333; },    },    T2: (context) => {        context.aaa();    }} : { T1: { aaa(): 333; }; T2: (context: { aaa(): 333; }) => void; }
+
+    T1: {
+>T1 : { aaa(): 333; }
+>{        aaa(){ return 333; },    } : { aaa(): 333; }
+
+        aaa(){ return 333; },
+>aaa : () => 333
+>333 : 333
+
+    },
+    T2: (context) => {
+>T2 : (context: { aaa(): 333; }) => void
+>(context) => {        context.aaa();    } : (context: { aaa(): 333; }) => void
+>context : { aaa(): 333; }
+
+        context.aaa();
+>context.aaa() : 333
+>context.aaa : () => 333
+>context : { aaa(): 333; }
+>aaa : () => 333
+    }
+});

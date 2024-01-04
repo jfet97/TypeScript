@@ -2,7 +2,7 @@
 
 // Repro from #52198
 
-declare function createInstance<Ctor extends new (...args: any[]) => any, R extends InstanceType<Ctor>>(ctor: Ctor, ...args: ConstructorParameters<Ctor>): R;
+declare function createInstance<Ctor extends new (...args: any[]) => any, R extends InstanceType<Ctor> = never>(ctor: Ctor, ...args: ConstructorParameters<Ctor>): R;
 
 export interface IMenuWorkbenchToolBarOptions {
     toolbarOptions: {

@@ -251,7 +251,7 @@ As an example, compiler tests usually emit one file each for
 When a change in the baselines is detected, the test will fail. To inspect changes vs the expected baselines, use
 
 ```Shell
-git diff --diff-filter=AM --no-index ./tests/baselines/reference ./tests/baselines/local
+git diff --diff-filter=AM --no-index ./tests/baselines/reference/cachedContextualTypes.errors.txt ./tests/baselines/local/cachedContextualTypes.errors.txt
 ```
 
 Alternatively, you can set the `DIFF` environment variable and run `hereby diff`, or manually run your favorite folder diffing tool between `tests/baselines/reference` and `tests/baselines/local`. Our team largely uses Beyond Compare and WinMerge.
