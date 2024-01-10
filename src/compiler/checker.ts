@@ -13802,14 +13802,18 @@ export function createTypeChecker(host: TypeCheckerHost): TypeChecker {
         const modifiersType = getApparentType(getModifiersTypeFromMappedType(type)); // The 'T' in 'keyof T'
         const templateModifiers = getMappedTypeModifiers(type);
         const include = keyofStringsOnly ? TypeFlags.StringLiteral : TypeFlags.StringOrNumberLiteralOrUnique;
+        let callSignatures: readonly Signature[] = emptyArray;
+        let constructSignatures: readonly Signature[] = emptyArray;
         if (isMappedTypeWithKeyofConstraintDeclaration(type)) {
             // We have a { [P in keyof T]: X }
             forEachMappedTypePropertyKeyTypeAndIndexSignatureKeyType(modifiersType, include, keyofStringsOnly, addMemberForKeyType);
+            callSignatures = getSignaturesOfType(modifiersType, SignatureKind.Call);
+            constructSignatures = getSignaturesOfType(modifiersType, SignatureKind.Construct);
         }
         else {
             forEachType(getLowerBoundOfKeyType(constraintType), addMemberForKeyType);
         }
-        setStructuredTypeMembers(type, members, emptyArray, emptyArray, indexInfos || emptyArray);
+        setStructuredTypeMembers(type, members, callSignatures, constructSignatures, indexInfos || emptyArray);
 
         function addMemberForKeyType(keyType: Type) {
             const propNameType = nameType ? instantiateType(nameType, appendTypeMapping(type.mapper, typeParameter, keyType)) : keyType;

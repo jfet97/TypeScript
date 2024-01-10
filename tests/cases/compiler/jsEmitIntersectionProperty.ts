@@ -19,7 +19,7 @@ declare class CoreObject {
   >(
     this: Statics & { new(): Instance },
     arg1: T1
-  ): Readonly<Statics> & { new(): T1 & Instance };
+  ): Readonly<{[K in keyof Statics & PropertyKey]: Statics[K]}> & { new(): T1 & Instance };
 
   toString(): string;
 }

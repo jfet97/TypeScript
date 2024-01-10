@@ -4,9 +4,9 @@
 
 // Mixin utilities
 export type Constructor<T = {}> = new (...args: any[]) => T;
-export type PropertiesOf<T> = { [K in keyof T]: T[K] };
+export type PropertiesOf<T> = { [K in keyof T & PropertyKey]: T[K] };
 
-interface IApiItemConstructor extends Constructor<ApiItem>, PropertiesOf<typeof ApiItem> {}
+interface IApiItemConstructor extends PropertiesOf<typeof ApiItem>, Constructor<ApiItem> {}
 
 // Base class
 class ApiItem {

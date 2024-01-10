@@ -1,0 +1,92 @@
+//// [tests/cases/compiler/homomorphicMappedTypesPreserveCallConstructorSignatures.ts] ////
+
+=== homomorphicMappedTypesPreserveCallConstructorSignatures.ts ===
+type YesWithRenaming<T> = { [P in keyof T as `${P & string}bla`]: { value: YesWithRenaming<T[P]> } };
+>YesWithRenaming : Symbol(YesWithRenaming, Decl(homomorphicMappedTypesPreserveCallConstructorSignatures.ts, 0, 0))
+>T : Symbol(T, Decl(homomorphicMappedTypesPreserveCallConstructorSignatures.ts, 0, 21))
+>P : Symbol(P, Decl(homomorphicMappedTypesPreserveCallConstructorSignatures.ts, 0, 29))
+>T : Symbol(T, Decl(homomorphicMappedTypesPreserveCallConstructorSignatures.ts, 0, 21))
+>P : Symbol(P, Decl(homomorphicMappedTypesPreserveCallConstructorSignatures.ts, 0, 29))
+>value : Symbol(value, Decl(homomorphicMappedTypesPreserveCallConstructorSignatures.ts, 0, 67))
+>YesWithRenaming : Symbol(YesWithRenaming, Decl(homomorphicMappedTypesPreserveCallConstructorSignatures.ts, 0, 0))
+>T : Symbol(T, Decl(homomorphicMappedTypesPreserveCallConstructorSignatures.ts, 0, 21))
+>P : Symbol(P, Decl(homomorphicMappedTypesPreserveCallConstructorSignatures.ts, 0, 29))
+
+type YesWithoutRenaming<T> = { [P in keyof T]: { value: YesWithoutRenaming<T[P]> } };
+>YesWithoutRenaming : Symbol(YesWithoutRenaming, Decl(homomorphicMappedTypesPreserveCallConstructorSignatures.ts, 0, 101))
+>T : Symbol(T, Decl(homomorphicMappedTypesPreserveCallConstructorSignatures.ts, 1, 24))
+>P : Symbol(P, Decl(homomorphicMappedTypesPreserveCallConstructorSignatures.ts, 1, 32))
+>T : Symbol(T, Decl(homomorphicMappedTypesPreserveCallConstructorSignatures.ts, 1, 24))
+>value : Symbol(value, Decl(homomorphicMappedTypesPreserveCallConstructorSignatures.ts, 1, 48))
+>YesWithoutRenaming : Symbol(YesWithoutRenaming, Decl(homomorphicMappedTypesPreserveCallConstructorSignatures.ts, 0, 101))
+>T : Symbol(T, Decl(homomorphicMappedTypesPreserveCallConstructorSignatures.ts, 1, 24))
+>P : Symbol(P, Decl(homomorphicMappedTypesPreserveCallConstructorSignatures.ts, 1, 32))
+
+type NoBecauseNotHomomorphic<T> = { [P in keyof T & PropertyKey]: { value: NoBecauseNotHomomorphic<T[P]> } };
+>NoBecauseNotHomomorphic : Symbol(NoBecauseNotHomomorphic, Decl(homomorphicMappedTypesPreserveCallConstructorSignatures.ts, 1, 85))
+>T : Symbol(T, Decl(homomorphicMappedTypesPreserveCallConstructorSignatures.ts, 2, 29))
+>P : Symbol(P, Decl(homomorphicMappedTypesPreserveCallConstructorSignatures.ts, 2, 37))
+>T : Symbol(T, Decl(homomorphicMappedTypesPreserveCallConstructorSignatures.ts, 2, 29))
+>PropertyKey : Symbol(PropertyKey, Decl(lib.es5.d.ts, --, --))
+>value : Symbol(value, Decl(homomorphicMappedTypesPreserveCallConstructorSignatures.ts, 2, 67))
+>NoBecauseNotHomomorphic : Symbol(NoBecauseNotHomomorphic, Decl(homomorphicMappedTypesPreserveCallConstructorSignatures.ts, 1, 85))
+>T : Symbol(T, Decl(homomorphicMappedTypesPreserveCallConstructorSignatures.ts, 2, 29))
+>P : Symbol(P, Decl(homomorphicMappedTypesPreserveCallConstructorSignatures.ts, 2, 37))
+
+interface Foo {
+>Foo : Symbol(Foo, Decl(homomorphicMappedTypesPreserveCallConstructorSignatures.ts, 2, 109))
+
+  (): string;
+  (x: number): number;
+>x : Symbol(x, Decl(homomorphicMappedTypesPreserveCallConstructorSignatures.ts, 6, 3))
+
+  prop: string;
+>prop : Symbol(Foo.prop, Decl(homomorphicMappedTypesPreserveCallConstructorSignatures.ts, 6, 22))
+}
+
+interface Test {
+>Test : Symbol(Test, Decl(homomorphicMappedTypesPreserveCallConstructorSignatures.ts, 8, 1))
+
+  a: string;
+>a : Symbol(Test.a, Decl(homomorphicMappedTypesPreserveCallConstructorSignatures.ts, 10, 16))
+
+  b: number;
+>b : Symbol(Test.b, Decl(homomorphicMappedTypesPreserveCallConstructorSignatures.ts, 11, 12))
+
+  (): boolean;
+  new(arg: unknown): { prop: unknown}
+>arg : Symbol(arg, Decl(homomorphicMappedTypesPreserveCallConstructorSignatures.ts, 14, 6))
+>prop : Symbol(prop, Decl(homomorphicMappedTypesPreserveCallConstructorSignatures.ts, 14, 22))
+
+  readonly nested: {
+>nested : Symbol(Test.nested, Decl(homomorphicMappedTypesPreserveCallConstructorSignatures.ts, 14, 37))
+
+    (): string;
+    c?: boolean;
+>c : Symbol(c, Decl(homomorphicMappedTypesPreserveCallConstructorSignatures.ts, 16, 15))
+
+    new(arg: unknown): { prop: unknown}
+>arg : Symbol(arg, Decl(homomorphicMappedTypesPreserveCallConstructorSignatures.ts, 18, 8))
+>prop : Symbol(prop, Decl(homomorphicMappedTypesPreserveCallConstructorSignatures.ts, 18, 24))
+
+    readonly d: Foo
+>d : Symbol(d, Decl(homomorphicMappedTypesPreserveCallConstructorSignatures.ts, 18, 39))
+>Foo : Symbol(Foo, Decl(homomorphicMappedTypesPreserveCallConstructorSignatures.ts, 2, 109))
+  }
+}
+
+type T1 = YesWithRenaming<Test>
+>T1 : Symbol(T1, Decl(homomorphicMappedTypesPreserveCallConstructorSignatures.ts, 21, 1))
+>YesWithRenaming : Symbol(YesWithRenaming, Decl(homomorphicMappedTypesPreserveCallConstructorSignatures.ts, 0, 0))
+>Test : Symbol(Test, Decl(homomorphicMappedTypesPreserveCallConstructorSignatures.ts, 8, 1))
+
+type T2 = YesWithoutRenaming<Test>
+>T2 : Symbol(T2, Decl(homomorphicMappedTypesPreserveCallConstructorSignatures.ts, 23, 31))
+>YesWithoutRenaming : Symbol(YesWithoutRenaming, Decl(homomorphicMappedTypesPreserveCallConstructorSignatures.ts, 0, 101))
+>Test : Symbol(Test, Decl(homomorphicMappedTypesPreserveCallConstructorSignatures.ts, 8, 1))
+
+type T3 = NoBecauseNotHomomorphic<Test>
+>T3 : Symbol(T3, Decl(homomorphicMappedTypesPreserveCallConstructorSignatures.ts, 24, 34))
+>NoBecauseNotHomomorphic : Symbol(NoBecauseNotHomomorphic, Decl(homomorphicMappedTypesPreserveCallConstructorSignatures.ts, 1, 85))
+>Test : Symbol(Test, Decl(homomorphicMappedTypesPreserveCallConstructorSignatures.ts, 8, 1))
+

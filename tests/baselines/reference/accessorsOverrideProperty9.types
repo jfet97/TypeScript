@@ -8,10 +8,10 @@ export type Constructor<T = {}> = new (...args: any[]) => T;
 >Constructor : Constructor<T>
 >args : any[]
 
-export type PropertiesOf<T> = { [K in keyof T]: T[K] };
+export type PropertiesOf<T> = { [K in keyof T & PropertyKey]: T[K] };
 >PropertiesOf : PropertiesOf<T>
 
-interface IApiItemConstructor extends Constructor<ApiItem>, PropertiesOf<typeof ApiItem> {}
+interface IApiItemConstructor extends PropertiesOf<typeof ApiItem>, Constructor<ApiItem> {}
 >ApiItem : typeof ApiItem
 
 // Base class
