@@ -1195,6 +1195,7 @@ export namespace Completion {
         typeEntry("Lowercase"),
         typeEntry("Capitalize"),
         typeEntry("Uncapitalize"),
+        typeEntry("GetLabels"),
         interfaceEntry("ThisType"),
         varEntry("ArrayBuffer"),
         interfaceEntry("ArrayBufferTypes"),

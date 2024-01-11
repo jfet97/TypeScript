@@ -1364,6 +1364,7 @@ const enum IntrinsicTypeKind {
     Lowercase,
     Capitalize,
     Uncapitalize,
+    GetLabels,
 }
 
 const intrinsicTypeKinds: ReadonlyMap<string, IntrinsicTypeKind> = new Map(Object.entries({
@@ -1371,6 +1372,7 @@ const intrinsicTypeKinds: ReadonlyMap<string, IntrinsicTypeKind> = new Map(Objec
     Lowercase: IntrinsicTypeKind.Lowercase,
     Capitalize: IntrinsicTypeKind.Capitalize,
     Uncapitalize: IntrinsicTypeKind.Uncapitalize,
+    GetLabels: IntrinsicTypeKind.GetLabels,
 }));
 
 const SymbolLinks = class implements SymbolLinks {
@@ -15927,9 +15929,14 @@ export function createTypeChecker(host: TypeCheckerHost): TypeChecker {
 
     function getTypeAliasInstantiation(symbol: Symbol, typeArguments: readonly Type[] | undefined, aliasSymbol?: Symbol, aliasTypeArguments?: readonly Type[]): Type {
         const type = getDeclaredTypeOfSymbol(symbol);
-        if (type === intrinsicMarkerType && intrinsicTypeKinds.has(symbol.escapedName as string) && typeArguments && typeArguments.length === 1) {
-            return getStringMappingType(symbol, typeArguments[0]);
+        if (type === intrinsicMarkerType) {
+            const typeKind = intrinsicTypeKinds.get(symbol.escapedName as string);
+
+            if (typeKind !== undefined && typeArguments && typeArguments.length === 1) {
+                return typeKind === IntrinsicTypeKind.GetLabels ? getGetLabelsType(symbol, typeArguments[0]) : getStringMappingType(symbol, typeArguments[0]);
+            }
         }
+
         const links = getSymbolLinks(symbol);
         const typeParameters = links.typeParameters!;
         const id = getTypeListId(typeArguments) + getAliasId(aliasSymbol, aliasTypeArguments);
@@ -16087,6 +16094,23 @@ export function createTypeChecker(host: TypeCheckerHost): TypeChecker {
             }
         }
         return errorType;
+    }
+
+    function getGetLabelsType(symbol: Symbol, type: Type): Type {
+        if (type.flags & (TypeFlags.Union | TypeFlags.Never)) {
+            return mapType(type, t => getGetLabelsType(symbol, t));
+        }
+        if (isTupleType(type)) {
+            // TODOGL type.target.elementFlags
+
+            return createTupleType(map(getElementTypes(type), (element, index) => {
+                const elementLabel = (type.target.labeledElementDeclarations && type.target.labeledElementDeclarations.at(index)) && getTupleElementLabel(type.target.labeledElementDeclarations.at(index), index);
+                const label = elementLabel ? createLiteralType(TypeFlags.StringLiteral, elementLabel.toString()) : neverType;
+                return createTupleType([label, element]);
+            }));
+        }
+
+        return type;
     }
 
     /**

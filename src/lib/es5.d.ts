@@ -1649,6 +1649,11 @@ type Capitalize<S extends string> = intrinsic;
 type Uncapitalize<S extends string> = intrinsic;
 
 /**
+ * Extract labels from tuple type
+ */
+type GetLabels<T extends readonly any[]> = intrinsic;
+
+/**
  * Marker for contextual 'this' type
  */
 interface ThisType<T> {}
