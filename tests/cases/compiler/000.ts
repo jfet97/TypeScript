@@ -20,3 +20,6 @@ type T4 = GetLabelsDeferred<[a: 1, b: 2, 3]> // TODO: doesn't work with generics
 
 type T5 = GetLabels<number[]>
 //    ^?
+
+type T6 = GetLabels<{a: "smt"}[] | [...label1: string[], label2: 2] | [...string[], label3: 3]>
+//    ^?
