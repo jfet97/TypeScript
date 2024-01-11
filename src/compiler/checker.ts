@@ -16106,7 +16106,8 @@ export function createTypeChecker(host: TypeCheckerHost): TypeChecker {
             return createTupleType(map(getElementTypes(type), (element, index) => {
                 const elementLabel = (type.target.labeledElementDeclarations && type.target.labeledElementDeclarations.at(index)) && getTupleElementLabel(type.target.labeledElementDeclarations.at(index), index);
                 const label = elementLabel ? createLiteralType(TypeFlags.StringLiteral, elementLabel.toString()) : neverType;
-                return createTupleType([label, element]);
+                const elementFlags = type.target.elementFlags.at(index) && [ElementFlags.Required, type.target.elementFlags.at(index)!]
+                return createTupleType([label, element], elementFlags);
             }));
         }
 
