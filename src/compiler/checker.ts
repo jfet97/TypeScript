@@ -16101,14 +16101,18 @@ export function createTypeChecker(host: TypeCheckerHost): TypeChecker {
             return mapType(type, t => getGetLabelsType(symbol, t));
         }
         if (isTupleType(type)) {
-            // TODOGL type.target.elementFlags
-
             return createTupleType(map(getElementTypes(type), (element, index) => {
                 const elementLabel = (type.target.labeledElementDeclarations && type.target.labeledElementDeclarations.at(index)) && getTupleElementLabel(type.target.labeledElementDeclarations.at(index), index);
                 const label = elementLabel ? createLiteralType(TypeFlags.StringLiteral, elementLabel.toString()) : neverType;
-                const elementFlags = type.target.elementFlags.at(index) && [ElementFlags.Required, type.target.elementFlags.at(index)!]
+                const elementFlags = type.target.elementFlags.at(index) && [ElementFlags.Required, type.target.elementFlags.at(index)!];
                 return createTupleType([label, element], elementFlags);
             }));
+        }
+        if (isArrayType(type)) {
+            const elementType = getElementTypeOfArrayType(type);
+            if (elementType) {
+                return createTupleType([neverType, elementType]);
+            }
         }
 
         return type;
