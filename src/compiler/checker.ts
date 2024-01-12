@@ -15932,8 +15932,22 @@ export function createTypeChecker(host: TypeCheckerHost): TypeChecker {
         if (type === intrinsicMarkerType) {
             const typeKind = intrinsicTypeKinds.get(symbol.escapedName as string);
 
-            if (typeKind !== undefined && typeArguments && typeArguments.length === 1) {
-                return typeKind === IntrinsicTypeKind.GetLabels ? getGetLabelsType(symbol, typeArguments[0]) : getStringMappingType(symbol, typeArguments[0]);
+            if (typeKind !== undefined && typeArguments && typeArguments.length === 1 && typeKind !== IntrinsicTypeKind.GetLabels) {
+                return getStringMappingType(symbol, typeArguments[0]);
+            }
+
+            if (typeKind !== undefined && typeArguments && typeArguments.length === 1 && typeKind === IntrinsicTypeKind.GetLabels && !isGenericType(typeArguments[0])) {
+                return getGetLabelsType(symbol, typeArguments[0]);
+            }
+
+            if (typeKind !== undefined && typeArguments && typeArguments.length === 1 && typeKind === IntrinsicTypeKind.GetLabels && isGenericType(typeArguments[0])) {
+                const links = getSymbolLinks(symbol);
+                const id = getTypeListId(typeArguments) + getAliasId(aliasSymbol, aliasTypeArguments);
+                let instantiation = links.instantiations!.get(id);
+                if (!instantiation) {
+                    links.instantiations!.set(id, instantiation = instantiateTypeWorker(createObjectType(ObjectFlags.Anonymous | ObjectFlags.CouldContainTypeVariables), makeDeferredTypeMapper([typeArguments[0]], [() => getGetLabelsType(symbol, typeArguments[0])]), aliasSymbol, aliasTypeArguments));
+                }
+                return instantiation;
             }
         }
 
