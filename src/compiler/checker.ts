@@ -16120,18 +16120,21 @@ export function createTypeChecker(host: TypeCheckerHost): TypeChecker {
         }
 
         if (isGenericType(type)) {
+            const getLabelsType = getDeclaredTypeOfSymbol(symbol);
             const links = getSymbolLinks(symbol);
             const typeParameter = links.typeParameters![0];
             const id = getTypeListId([type]);
 
             let instantiation = links.instantiations!.get(id);
 
+            // mergeTypeMappers(createTypeMapper([typeParameter], [type]), makeDeferredTypeMapper([type], [() => getGetLabelsType(symbol, instantiateType(type, /*mapper*/ undefined))]))
+
             if (!instantiation) {
                 links.instantiations!.set(
                     id,
                     instantiation = instantiateTypeWorker(
-                        createObjectType(ObjectFlags.CouldContainTypeVariables),
-                        combineTypeMappers(createTypeMapper([typeParameter], [type]), makeDeferredTypeMapper([type], [() => getGetLabelsType(symbol, instantiateType(type, /*mapper*/ undefined))])),
+                        getLabelsType,
+                        createTypeMapper([typeParameter], [type]),
                         /*aliasSymbol*/ undefined,
                         /*aliasTypeArguments*/ undefined,
                     ),
@@ -16139,6 +16142,8 @@ export function createTypeChecker(host: TypeCheckerHost): TypeChecker {
             }
 
             return instantiation;
+
+            return type;
         }
 
         return type;
