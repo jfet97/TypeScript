@@ -15936,18 +15936,8 @@ export function createTypeChecker(host: TypeCheckerHost): TypeChecker {
                 return getStringMappingType(symbol, typeArguments[0]);
             }
 
-            if (typeKind !== undefined && typeArguments && typeArguments.length === 1 && typeKind === IntrinsicTypeKind.GetLabels && !isGenericType(typeArguments[0])) {
+            if (typeKind !== undefined && typeArguments && typeArguments.length === 1 && typeKind === IntrinsicTypeKind.GetLabels) {
                 return getGetLabelsType(symbol, typeArguments[0]);
-            }
-
-            if (typeKind !== undefined && typeArguments && typeArguments.length === 1 && typeKind === IntrinsicTypeKind.GetLabels && isGenericType(typeArguments[0])) {
-                const links = getSymbolLinks(symbol);
-                const id = getTypeListId(typeArguments) + getAliasId(aliasSymbol, aliasTypeArguments);
-                let instantiation = links.instantiations!.get(id);
-                if (!instantiation) {
-                    links.instantiations!.set(id, instantiation = instantiateTypeWorker(createObjectType(ObjectFlags.Anonymous | ObjectFlags.CouldContainTypeVariables), makeDeferredTypeMapper([typeArguments[0]], [() => getGetLabelsType(symbol, typeArguments[0])]), aliasSymbol, aliasTypeArguments));
-                }
-                return instantiation;
             }
         }
 
@@ -16127,6 +16117,30 @@ export function createTypeChecker(host: TypeCheckerHost): TypeChecker {
             if (elementType) {
                 return createTupleType([neverType, elementType]);
             }
+        }
+
+        if (isGenericType(type)) {
+            const links = getSymbolLinks(symbol);
+            const typeParameter = links.typeParameters![0];
+            const id = getTypeListId([type]);
+
+            let instantiation = links.instantiations!.get(id);
+
+            if (!instantiation) {
+                links.instantiations!.set(
+                    id,
+                    instantiation = instantiateTypeWorker(
+                        createObjectType(ObjectFlags.Anonymous | ObjectFlags.CouldContainTypeVariables),
+                        createTypeMapper([typeParameter], [type]),
+                        /*aliasSymbol*/ undefined,
+                        /*aliasTypeArguments*/ undefined,
+                    ),
+                );
+            }
+
+            // makeDeferredTypeMapper([typeArguments[0]], [() => getGetLabelsType(symbol, typeArguments[0])])
+
+            return instantiation;
         }
 
         return type;
