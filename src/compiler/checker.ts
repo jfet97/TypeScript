@@ -16130,15 +16130,13 @@ export function createTypeChecker(host: TypeCheckerHost): TypeChecker {
                 links.instantiations!.set(
                     id,
                     instantiation = instantiateTypeWorker(
-                        createObjectType(ObjectFlags.Anonymous | ObjectFlags.CouldContainTypeVariables),
-                        createTypeMapper([typeParameter], [type]),
+                        createObjectType(ObjectFlags.CouldContainTypeVariables),
+                        combineTypeMappers(createTypeMapper([typeParameter], [type]), makeDeferredTypeMapper([type], [() => getGetLabelsType(symbol, instantiateType(type, /*mapper*/ undefined))])),
                         /*aliasSymbol*/ undefined,
                         /*aliasTypeArguments*/ undefined,
                     ),
                 );
             }
-
-            // makeDeferredTypeMapper([typeArguments[0]], [() => getGetLabelsType(symbol, typeArguments[0])])
 
             return instantiation;
         }
