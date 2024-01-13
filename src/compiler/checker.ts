@@ -2284,6 +2284,7 @@ export function createTypeChecker(host: TypeCheckerHost): TypeChecker {
 
     var getLabelsSyntheticType = createAnonymousType(/*symbol*/ undefined, emptySymbols, emptyArray, emptyArray, emptyArray) as ObjectType as GenericType;
     getLabelsSyntheticType.instantiations = new Map<string, TypeReference>();
+    getLabelsSyntheticType.flags |= ObjectFlags.Tuple
 
     /* eslint-enable no-var */
 

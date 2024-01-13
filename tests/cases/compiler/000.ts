@@ -20,7 +20,7 @@
 // type AddLevelOfIndirection<E extends readonly any[]> = E extends ["ciao"] ? never : GetLabelsDeferred<E>;
 
 // type T4 = AddLevelOfIndirection<[a: 1, b: 2, 3]>
-//    ^?
+// //   ^?
 
 // type T5 = GetLabels<number[]>
 // //    ^?
