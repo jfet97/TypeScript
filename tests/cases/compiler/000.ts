@@ -55,14 +55,27 @@
 // type T12 = IndexedAccess<`1`>
 // //   ^?
 
-type IndexedAccessToBeDeferred<T extends readonly any[], I extends `${number}`> = GetLabels<T>[I]
+// type IndexedAccessToBeDeferred<T extends readonly any[], I extends `${number}`> = GetLabels<T>[I]
 
-type T13 = IndexedAccessToBeDeferred<[a: 1, b: 2, c: 3], `1`>
-//   ^?
+// type T13 = IndexedAccessToBeDeferred<[a: 1, b: 2, c: 3], `1`>
+// //   ^?
 
-// type ToObject<T extends readonly any[]> = {
-//   [I in keyof GetLabels<T> as GetLabels<T>[I][0]]: GetLabels<T>[I][1]
+// type IndexedAccessToBeDeferred2<T extends readonly any[], I extends `${number}`> = [GetLabels<T>[I][0], GetLabels<T>[I][1]]
+
+// type T14 = IndexedAccessToBeDeferred2<[a: 1, b: 2, c: 3], `1`>
+// //   ^?
+
+// type ToObject<T extends readonly [string, any][]> = {
+//   [I in keyof T & `${number}` as T[I][0] ]: T[I][1]
 // }
 
-// type T11 = ToObject<[a: 1, b: 2, c: 3]>
+// type T15 = ToObject<GetLabels<[a: 1, b: 2, c: 3]>>
 // //   ^?
+
+type ToObject2<T extends readonly any[]> =
+  GetLabels<T> extends infer $Labels extends readonly [string, any][]
+    ? { [I in keyof $Labels & `${number}` as $Labels[I][0]]: $Labels[I][1] }
+    : never
+
+type T16 = ToObject2<[a: 1, b: 2, c: 3]>
+//   ^?
