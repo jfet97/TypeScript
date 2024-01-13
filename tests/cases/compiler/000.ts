@@ -15,14 +15,12 @@
 // type T3 = GetLabels<[a: 1, b: 2, ...c: number[]]>
 // //    ^?
 
+// type GetLabelsDeferred<X extends readonly any[]> = GetLabels<X>;
 
-type GetLabelsDeferred<X extends readonly any[]> = GetLabels<X> // [...X, 1, 2, 3] // GetLabels<X>;
+// type AddLevelOfIndirection<E extends readonly any[]> = E extends ["ciao"] ? never : GetLabelsDeferred<E>;
 
-type AddLevelOfIndirection<E extends readonly any[]> = E extends ["ciao"] ? never : GetLabelsDeferred<E>;
-
-type T4 = AddLevelOfIndirection<[a: 1, b: 2, 3]> // TODO: it works with generics!!!
+// type T4 = AddLevelOfIndirection<[a: 1, b: 2, 3]>
 //    ^?
-
 
 // type T5 = GetLabels<number[]>
 // //    ^?
@@ -33,15 +31,24 @@ type T4 = AddLevelOfIndirection<[a: 1, b: 2, 3]> // TODO: it works with generics
 // type T7 = GetLabels<readonly number[]>
 // //    ^?
 
-
 // type GetLabelsWithTypeVariable<T> = GetLabels<[a: 1, b: T, 3]>;
 
-// type T8 = GetLabelsWithTypeVariable<"unsure">
+// type T8 = GetLabelsWithTypeVariable<"should be ok">
 // //    ^?
+
+type KeyofGetLabels<T extends readonly any[]> = keyof GetLabels<T>
+
+type T9 = KeyofGetLabels<[a: 1, b: 2, c: 3]>
+//   ^?
+
+type LabelValue<T extends readonly any[], I extends `${number}`> = [GetLabels<T>[I][0], GetLabels<T>[I][1]]
+
+type T10 = LabelValue<[a: 1, b: 2, c: 3], `1`>
+//   ^?
 
 type ToObject<T extends readonly any[]> = {
   [I in keyof GetLabels<T> as GetLabels<T>[I][0]]: GetLabels<T>[I][1]
 }
 
-type T9 = ToObject<[a: 1, b: 2, c: 3]>
+type T11 = ToObject<[a: 1, b: 2, c: 3]>
 //   ^?
