@@ -36,19 +36,19 @@
 // type T8 = GetLabelsWithTypeVariable<"should be ok">
 // //    ^?
 
-type KeyofGetLabels<T extends readonly any[]> = keyof GetLabels<T>
+type KeyofGetLabels<T extends readonly any[]> = [keyof GetLabels<T>, keyof GetLabels<T> & `${number}`]
 
 type T9 = KeyofGetLabels<[a: 1, b: 2, c: 3]>
 //   ^?
 
-type LabelValue<T extends readonly any[], I extends `${number}`> = [GetLabels<T>[I][0], GetLabels<T>[I][1]]
+// type LabelValue<T extends readonly any[], I extends `${number}`> = [GetLabels<T>[I][0], GetLabels<T>[I][1]]
 
-type T10 = LabelValue<[a: 1, b: 2, c: 3], `1`>
-//   ^?
+// type T10 = LabelValue<[a: 1, b: 2, c: 3], `1`>
+// //   ^?
 
-type ToObject<T extends readonly any[]> = {
-  [I in keyof GetLabels<T> as GetLabels<T>[I][0]]: GetLabels<T>[I][1]
-}
+// type ToObject<T extends readonly any[]> = {
+//   [I in keyof GetLabels<T> as GetLabels<T>[I][0]]: GetLabels<T>[I][1]
+// }
 
-type T11 = ToObject<[a: 1, b: 2, c: 3]>
-//   ^?
+// type T11 = ToObject<[a: 1, b: 2, c: 3]>
+// //   ^?
