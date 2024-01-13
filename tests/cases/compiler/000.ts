@@ -41,6 +41,15 @@ type KeyofGetLabels<T extends readonly any[]> = [keyof GetLabels<T>, keyof GetLa
 type T9 = KeyofGetLabels<[a: 1, b: 2, c: 3]>
 //   ^?
 
+type ConditionalGetLabels<B extends boolean, T extends readonly any[], U extends readonly any[]> =
+  GetLabels<B extends true ? T : U>
+
+type T10 = ConditionalGetLabels<true, [a: 1, b: 2, c: 3], [x: "x", y: "y", z: "z"]>
+//   ^?
+
+type T11 = ConditionalGetLabels<false, [a: 1, b: 2, c: 3], [x: "x", y: "y", z: "z"]>
+//   ^?
+
 // type LabelValue<T extends readonly any[], I extends `${number}`> = [GetLabels<T>[I][0], GetLabels<T>[I][1]]
 
 // type T10 = LabelValue<[a: 1, b: 2, c: 3], `1`>
