@@ -16,11 +16,11 @@
 // //    ^?
 
 
-type GetLabelsDeferred<X extends readonly any[]> = GetLabels<X>;
+type GetLabelsDeferred<X extends readonly any[]> = GetLabels<X> // [...X, 1, 2, 3] // GetLabels<X>;
 
-type AddLevelOfIndirection<E extends readonly any[]> = GetLabelsDeferred<E>;
+type AddLevelOfIndirection<E extends readonly any[]> = E extends ["ciao"] ? never : GetLabelsDeferred<E>;
 
-type T4 = AddLevelOfIndirection<[a: 1, b: 2, 3]> // TODO: it works with generics (but no with two indirections levels)!!!
+type T4 = AddLevelOfIndirection<[a: 1, b: 2, 3]> // TODO: it works with generics!!!
 //    ^?
 
 
@@ -38,3 +38,10 @@ type T4 = AddLevelOfIndirection<[a: 1, b: 2, 3]> // TODO: it works with generics
 
 // type T8 = GetLabelsWithTypeVariable<"unsure">
 // //    ^?
+
+type ToObject<T extends readonly any[]> = {
+  [I in keyof GetLabels<T> as GetLabels<T>[I][0]]: GetLabels<T>[I][1]
+}
+
+type T9 = ToObject<[a: 1, b: 2, c: 3]>
+//   ^?

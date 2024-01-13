@@ -16132,7 +16132,7 @@ export function createTypeChecker(host: TypeCheckerHost): TypeChecker {
             }
 
             if (!getLabelsSyntheticType.symbol) {
-                type.symbol = symbol;
+                getLabelsSyntheticType.symbol = symbol;
             }
 
             const id = getTypeListId([type]);
@@ -19917,7 +19917,7 @@ export function createTypeChecker(host: TypeCheckerHost): TypeChecker {
                     const newTypeArguments = instantiateTypes(resolvedTypeArguments, mapper);
                     if (newTypeArguments !== resolvedTypeArguments) {
                         if ((type as TypeReference).target === getLabelsSyntheticType && newTypeArguments && newTypeArguments[0]) {
-                            return getGetLabelsType((type as TypeReference).target.symbol, newTypeArguments[0]);
+                            return getGetLabelsType(getLabelsSyntheticType.symbol, newTypeArguments[0]);
                         }
                         else {
                             return createNormalizedTypeReference((type as TypeReference).target, newTypeArguments);
