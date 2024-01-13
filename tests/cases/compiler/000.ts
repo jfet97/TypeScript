@@ -72,22 +72,30 @@
 // type T15 = ToObject<GetLabels<[a: 1, b: 2, c: 3]>>
 // //   ^?
 
-type ConditionalCheckType<T extends readonly any[], U extends readonly [string, any][]> =
-  GetLabels<T> extends U ? true : false
+// type ConditionalCheckType<T extends readonly any[], U extends readonly [string, any][]> =
+//   GetLabels<T> extends U ? true : false
 
-type ConditionalExtendsType<T extends readonly any[], U extends readonly [string, any][]> =
-  U extends GetLabels<T> ? true : false
+// type ConditionalExtendsType<T extends readonly any[], U extends readonly [string, any][]> =
+//   U extends GetLabels<T> ? true : false
 
-type T16 = ConditionalCheckType<[a: 1, b: 2, c: 3], GetLabels<[a: 1, b: 2, c: 3]>>
-//   ^?
+// type T16 = ConditionalCheckType<[a: 1, b: 2, c: 3], GetLabels<[a: 1, b: 2, c: 3]>>
+// //   ^?
 
-type T17 = ConditionalExtendsType<[a: 1, b: 2, c: 3], GetLabels<[a: 1, b: 2, c: 3]>>
-//   ^?
+// type T17 = ConditionalExtendsType<[a: 1, b: 2, c: 3], GetLabels<[a: 1, b: 2, c: 3]>>
+// //   ^?
 
-type ToObject2<T extends readonly any[]> =
-  GetLabels<T> extends infer $Labels extends readonly [string, any][]
-    ? { [I in keyof $Labels & `${number}` as $Labels[I][0]]: $Labels[I][1] }
-    : never
+// type ToObject2<T extends readonly any[]> =
+//   GetLabels<T> extends infer $Labels extends readonly [string, any][]
+//     ? { [I in keyof $Labels & `${number}` as $Labels[I][0]]: $Labels[I][1] }
+//     : never
 
-type T18 = ToObject2<[a: 1, b: 2, c: 3]>
-//   ^?
+// type T18 = ToObject2<[a: 1, b: 2, c: 3]>
+// //   ^?
+
+type Test<T extends readonly any[]> = T extends ["a", "b", "c"] ? [[T[0], 0], [T[1], 1], [T[2], 2]] : []
+
+type TTest<T extends readonly any[], U extends readonly [any, number][]>    =
+    Test<T> extends U ? true : false
+
+
+type test = TTest<["a", "b", "c"], [["a", 0], ["b", 1], ["c", 2]]>
