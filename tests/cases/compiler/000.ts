@@ -20,7 +20,7 @@
 
 type AddLevelOfIndirection<E extends readonly any[]> = GetLabels<E>;
 
-type T4 = AddLevelOfIndirection<[a: 1, b: 2, 3]> // TODO: doesn't work with generics yet
+type T4 = AddLevelOfIndirection<[a: 1, b: 2, 3]> // TODO: it works with generics!!!
 //    ^?
 
 

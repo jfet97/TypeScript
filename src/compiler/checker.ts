@@ -16131,10 +16131,12 @@ export function createTypeChecker(host: TypeCheckerHost): TypeChecker {
                 getLabelsSyntheticType.resolvedTypeArguments = [typeParameter];
             }
 
+            if (!getLabelsSyntheticType.symbol) {
+                type.symbol = symbol;
+            }
+
             const id = getTypeListId([type]);
             let instantiation = links.instantiations!.get(id);
-
-            // mergeTypeMappers(createTypeMapper([typeParameter], [type]), makeDeferredTypeMapper([type], [() => getGetLabelsType(symbol, instantiateType(type, /*mapper*/ undefined))]))
 
             if (!instantiation) {
                 links.instantiations!.set(
@@ -19913,7 +19915,17 @@ export function createTypeChecker(host: TypeCheckerHost): TypeChecker {
                 if ((objectFlags & ObjectFlags.Reference && !(type as TypeReference).node)) {
                     const resolvedTypeArguments = (type as TypeReference).resolvedTypeArguments;
                     const newTypeArguments = instantiateTypes(resolvedTypeArguments, mapper);
-                    return newTypeArguments !== resolvedTypeArguments ? createNormalizedTypeReference((type as TypeReference).target, newTypeArguments) : type;
+                    if (newTypeArguments !== resolvedTypeArguments) {
+                        if ((type as TypeReference).target === getLabelsSyntheticType && newTypeArguments && newTypeArguments[0]) {
+                            return getGetLabelsType((type as TypeReference).target.symbol, newTypeArguments[0]);
+                        }
+                        else {
+                            return createNormalizedTypeReference((type as TypeReference).target, newTypeArguments);
+                        }
+                    }
+                    else {
+                        return type;
+                    }
                 }
                 if (objectFlags & ObjectFlags.ReverseMapped) {
                     return instantiateReverseMappedType(type as ReverseMappedType, mapper);
