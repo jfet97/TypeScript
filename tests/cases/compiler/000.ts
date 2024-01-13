@@ -36,24 +36,29 @@
 // type T8 = GetLabelsWithTypeVariable<"should be ok">
 // //    ^?
 
-type KeyofGetLabels<T extends readonly any[]> = [keyof GetLabels<T>, keyof GetLabels<T> & `${number}`]
+// type KeyofGetLabels<T extends readonly any[]> = [keyof GetLabels<T>, keyof GetLabels<T> & `${number}`]
 
-type T9 = KeyofGetLabels<[a: 1, b: 2, c: 3]>
-//   ^?
-
-type ConditionalGetLabels<B extends boolean, T extends readonly any[], U extends readonly any[]> =
-  GetLabels<B extends true ? T : U>
-
-type T10 = ConditionalGetLabels<true, [a: 1, b: 2, c: 3], [x: "x", y: "y", z: "z"]>
-//   ^?
-
-type T11 = ConditionalGetLabels<false, [a: 1, b: 2, c: 3], [x: "x", y: "y", z: "z"]>
-//   ^?
-
-// type LabelValue<T extends readonly any[], I extends `${number}`> = [GetLabels<T>[I][0], GetLabels<T>[I][1]]
-
-// type T10 = LabelValue<[a: 1, b: 2, c: 3], `1`>
+// type T9 = KeyofGetLabels<[a: 1, b: 2, c: 3]>
 // //   ^?
+
+// type ConditionalGetLabels<B extends boolean, T extends readonly any[], U extends readonly any[]> =
+//   GetLabels<B extends true ? T : U>
+
+// type T10 = ConditionalGetLabels<true, [a: 1, b: 2, c: 3], [x: "x", y: "y", z: "z"]>
+// //   ^?
+
+// type T11 = ConditionalGetLabels<false, [a: 1, b: 2, c: 3], [x: "x", y: "y", z: "z"]>
+// //   ^?
+
+// type IndexedAccess<I extends `${number}`> = [GetLabels<[a: 1, b: 2, c: 3]>[I][0], GetLabels<[a: 1, b: 2, c: 3]>[I][1]]
+
+// type T12 = IndexedAccess<`1`>
+// //   ^?
+
+type IndexedAccessToBeDeferred<T extends readonly any[], I extends `${number}`> = GetLabels<T>[I]
+
+type T13 = IndexedAccessToBeDeferred<[a: 1, b: 2, c: 3], `1`>
+//   ^?
 
 // type ToObject<T extends readonly any[]> = {
 //   [I in keyof GetLabels<T> as GetLabels<T>[I][0]]: GetLabels<T>[I][1]

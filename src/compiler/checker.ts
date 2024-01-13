@@ -18535,7 +18535,7 @@ export function createTypeChecker(host: TypeCheckerHost): TypeChecker {
         // preserve backwards compatibility. For example, an element access 'this["foo"]' has always been resolved
         // eagerly using the constraint type of 'this' at the given location.
         if (
-            isGenericIndexType(indexType) || (accessNode && accessNode.kind !== SyntaxKind.IndexedAccessType ?
+            isGenericIndexType(indexType) || isGetLabelsTypeOrReference(objectType) || (accessNode && accessNode.kind !== SyntaxKind.IndexedAccessType ?
                 isGenericTupleType(objectType) && !indexTypeLessThan(indexType, getTotalFixedElementCount(objectType.target)) :
                 isGenericObjectType(objectType) && !(isTupleType(objectType) && indexTypeLessThan(indexType, getTotalFixedElementCount(objectType.target))) || isGenericReducibleType(objectType))
         ) {
@@ -21004,7 +21004,7 @@ export function createTypeChecker(host: TypeCheckerHost): TypeChecker {
     }
 
     function isStringIndexSignatureOnlyType(type: Type): boolean {
-        return type.flags & TypeFlags.Object && !isGenericMappedType(type) && getPropertiesOfType(type).length === 0 && getIndexInfosOfType(type).length === 1 && !!getIndexInfoOfType(type, stringType) ||
+        return type.flags & TypeFlags.Object && !isGenericMappedType(type) && !isGetLabelsTypeOrReference(type) && getPropertiesOfType(type).length === 0 && getIndexInfosOfType(type).length === 1 && !!getIndexInfoOfType(type, stringType) ||
             type.flags & TypeFlags.UnionOrIntersection && every((type as UnionOrIntersectionType).types, isStringIndexSignatureOnlyType) ||
             false;
     }
