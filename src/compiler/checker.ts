@@ -2281,6 +2281,10 @@ export function createTypeChecker(host: TypeCheckerHost): TypeChecker {
         [".jsx", ".jsx"],
         [".json", ".json"],
     ];
+
+    var getLabelsSyntheticType = createAnonymousType(/*symbol*/ undefined, emptySymbols, emptyArray, emptyArray, emptyArray) as ObjectType as GenericType;
+    getLabelsSyntheticType.instantiations = new Map<string, TypeReference>();
+
     /* eslint-enable no-var */
 
     initializeTypeChecker();
@@ -16120,11 +16124,14 @@ export function createTypeChecker(host: TypeCheckerHost): TypeChecker {
         }
 
         if (isGenericType(type)) {
-            const getLabelsType = getDeclaredTypeOfSymbol(symbol);
             const links = getSymbolLinks(symbol);
             const typeParameter = links.typeParameters![0];
-            const id = getTypeListId([type]);
 
+            if (!getLabelsSyntheticType.resolvedTypeArguments?.length) {
+                getLabelsSyntheticType.resolvedTypeArguments = [typeParameter];
+            }
+
+            const id = getTypeListId([type]);
             let instantiation = links.instantiations!.get(id);
 
             // mergeTypeMappers(createTypeMapper([typeParameter], [type]), makeDeferredTypeMapper([type], [() => getGetLabelsType(symbol, instantiateType(type, /*mapper*/ undefined))]))
@@ -16133,7 +16140,7 @@ export function createTypeChecker(host: TypeCheckerHost): TypeChecker {
                 links.instantiations!.set(
                     id,
                     instantiation = instantiateTypeWorker(
-                        getLabelsType,
+                        getLabelsSyntheticType,
                         createTypeMapper([typeParameter], [type]),
                         /*aliasSymbol*/ undefined,
                         /*aliasTypeArguments*/ undefined,
@@ -16142,8 +16149,6 @@ export function createTypeChecker(host: TypeCheckerHost): TypeChecker {
             }
 
             return instantiation;
-
-            return type;
         }
 
         return type;
@@ -19905,13 +19910,18 @@ export function createTypeChecker(host: TypeCheckerHost): TypeChecker {
         if (flags & TypeFlags.Object) {
             const objectFlags = (type as ObjectType).objectFlags;
             if (objectFlags & (ObjectFlags.Reference | ObjectFlags.Anonymous | ObjectFlags.Mapped)) {
-                if (objectFlags & ObjectFlags.Reference && !(type as TypeReference).node) {
+                if ((objectFlags & ObjectFlags.Reference && !(type as TypeReference).node)) {
                     const resolvedTypeArguments = (type as TypeReference).resolvedTypeArguments;
                     const newTypeArguments = instantiateTypes(resolvedTypeArguments, mapper);
                     return newTypeArguments !== resolvedTypeArguments ? createNormalizedTypeReference((type as TypeReference).target, newTypeArguments) : type;
                 }
                 if (objectFlags & ObjectFlags.ReverseMapped) {
                     return instantiateReverseMappedType(type as ReverseMappedType, mapper);
+                }
+                if (type === getLabelsSyntheticType) {
+                    const resolvedTypeArguments = (type as TypeReference).resolvedTypeArguments;
+                    const newTypeArguments = instantiateTypes(resolvedTypeArguments, mapper);
+                    return createTypeReference(type as GenericType, newTypeArguments);
                 }
                 return getObjectTypeInstantiation(type as TypeReference | AnonymousType | MappedType, mapper, aliasSymbol, aliasTypeArguments);
             }

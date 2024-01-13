@@ -16,9 +16,9 @@
 // //    ^?
 
 
-type GetLabelsDeferred<E extends readonly any[]> = [...E, 1, 2, 3] // GetLabels<E>;
+// type GetLabelsDeferred<X extends readonly any[]> = [...X, 1, 2, 3] // GetLabels<E>;
 
-type AddLevelOfIndirection<E extends readonly any[]> = GetLabelsDeferred<E>;
+type AddLevelOfIndirection<E extends readonly any[]> = GetLabels<E>;
 
 type T4 = AddLevelOfIndirection<[a: 1, b: 2, 3]> // TODO: doesn't work with generics yet
 //    ^?
