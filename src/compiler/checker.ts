@@ -2284,7 +2284,7 @@ export function createTypeChecker(host: TypeCheckerHost): TypeChecker {
 
     var getLabelsSyntheticType = createAnonymousType(/*symbol*/ undefined, emptySymbols, emptyArray, emptyArray, emptyArray) as ObjectType as GenericType;
     getLabelsSyntheticType.instantiations = new Map<string, TypeReference>();
-    getLabelsSyntheticType.flags |= ObjectFlags.Tuple;
+    getLabelsSyntheticType.members = createSymbolTable();
 
     /* eslint-enable no-var */
 
@@ -14019,7 +14019,10 @@ export function createTypeChecker(host: TypeCheckerHost): TypeChecker {
     function resolveStructuredTypeMembers(type: StructuredType): ResolvedType {
         if (!(type as ResolvedType).members) {
             if (type.flags & TypeFlags.Object) {
-                if ((type as ObjectType).objectFlags & ObjectFlags.Reference) {
+                if (isGetLabelsTypeOrReference(type)) {
+                    (type as ObjectType).members = createSymbolTable();
+                }
+                else if ((type as ObjectType).objectFlags & ObjectFlags.Reference) {
                     resolveTypeReferenceMembers(type as TypeReference);
                 }
                 else if ((type as ObjectType).objectFlags & ObjectFlags.ClassOrInterface) {
