@@ -4360,7 +4360,23 @@ namespace Parser {
             return parseSignatureMember(SyntaxKind.ConstructSignature);
         }
 
-        if (token() === SyntaxKind.TypeKeyword) {
+        // TODO(jfet97): create a function for the lambda to respect the coding style
+        if (
+            token() === SyntaxKind.TypeKeyword && lookAhead(() => {
+                nextToken();
+
+                // interface {       interface {                interface {
+                //   type       or     type: string       or      type,
+                // }                 }                          }
+                //
+                // are not existential type declarations
+                return !canParseSemicolon() &&
+                token() !== SyntaxKind.ColonToken &&
+                token() !== SyntaxKind.CommaToken &&
+                token() !== SyntaxKind.OpenParenToken &&
+                token() !== SyntaxKind.LessThanToken
+            })
+        ) {
             return parseExistentialTypeMember();
         }
 
