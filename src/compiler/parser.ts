@@ -4211,7 +4211,7 @@ namespace Parser {
         // Parse the default type for the existential type member
         const defaultType = parseOptional(SyntaxKind.EqualsToken) ? parseType() : undefined;
 
-        parseSemicolon();
+        parseTypeMemberSemicolon();
 
         // TODO(jfet97): let's see if we can avoid the cast
         const node = factory.createTypeParameterDeclaration(modifiers, name, constraint, defaultType) as ExistentialTypeParameterDeclaration;
