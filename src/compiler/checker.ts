@@ -9648,6 +9648,8 @@ export function createTypeChecker(host: TypeCheckerHost): TypeChecker {
                         typeParamDecls,
                         heritageClauses,
                         [...indexSignatures, ...constructSignatures, ...callSignatures, ...members],
+                        // TODO(jfet97): support existentials
+                        /*existentialTypeParameters*/ undefined,
                     ),
                     modifierFlags,
                 );

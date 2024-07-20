@@ -4429,11 +4429,13 @@ export function createNodeFactory(flags: NodeFactoryFlags, baseFactory: BaseNode
         typeParameters: readonly TypeParameterDeclaration[] | undefined,
         heritageClauses: readonly HeritageClause[] | undefined,
         members: readonly TypeElement[],
+        existentialTypeParameters: readonly TypeParameterDeclaration[] | undefined,
     ) {
         const node = createBaseDeclaration<InterfaceDeclaration>(SyntaxKind.InterfaceDeclaration);
         node.modifiers = asNodeArray(modifiers);
         node.name = asName(name);
         node.typeParameters = asNodeArray(typeParameters);
+        node.existentialTypeParameters = asNodeArray(existentialTypeParameters);
         node.heritageClauses = asNodeArray(heritageClauses);
         node.members = createNodeArray(members);
         node.transformFlags = TransformFlags.ContainsTypeScript;
@@ -4451,12 +4453,13 @@ export function createNodeFactory(flags: NodeFactoryFlags, baseFactory: BaseNode
         heritageClauses: readonly HeritageClause[] | undefined,
         members: readonly TypeElement[],
     ) {
+        // TODO(jfet97): handle existentialTypeParameters update
         return node.modifiers !== modifiers
                 || node.name !== name
                 || node.typeParameters !== typeParameters
                 || node.heritageClauses !== heritageClauses
                 || node.members !== members
-            ? update(createInterfaceDeclaration(modifiers, name, typeParameters, heritageClauses, members), node)
+            ? update(createInterfaceDeclaration(modifiers, name, typeParameters, heritageClauses, members, /*existentialTypeParameters*/ undefined), node)
             : node;
     }
 

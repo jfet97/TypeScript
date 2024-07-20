@@ -357,6 +357,8 @@ function doInterfaceChange(changes: textChanges.ChangeTracker, file: SourceFile,
         typeParameters,
         /*heritageClauses*/ undefined,
         typeElements,
+        // TODO(jfet97): support existentials here
+        /*existentialTypeParameters*/ undefined,
     );
     setTextRange(newTypeNode, typeElements[0]?.parent);
     changes.insertNodeBefore(file, enclosingNode, ignoreSourceNewlines(newTypeNode), /*blankLineBetween*/ true);

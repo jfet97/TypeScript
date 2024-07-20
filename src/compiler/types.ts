@@ -1824,6 +1824,11 @@ export interface TypeParameterDeclaration extends NamedDeclaration, JSDocContain
     expression?: Expression;
 }
 
+// TODO(jfet97): try to extend TypeElement too
+export interface ExistentialTypeParameterDeclaration extends TypeParameterDeclaration {
+    _typeElementBrand: any;
+}
+
 export interface SignatureDeclarationBase extends NamedDeclaration, JSDocContainer {
     readonly kind: SignatureDeclaration["kind"];
     readonly name?: PropertyName;
@@ -3552,6 +3557,7 @@ export interface InterfaceDeclaration extends DeclarationStatement, JSDocContain
     readonly typeParameters?: NodeArray<TypeParameterDeclaration>;
     readonly heritageClauses?: NodeArray<HeritageClause>;
     readonly members: NodeArray<TypeElement>;
+    readonly existentialTypeParameters? : NodeArray<TypeParameterDeclaration>;
 }
 
 export interface HeritageClause extends Node {
@@ -8901,7 +8907,7 @@ export interface NodeFactory {
     updateFunctionDeclaration(node: FunctionDeclaration, modifiers: readonly ModifierLike[] | undefined, asteriskToken: AsteriskToken | undefined, name: Identifier | undefined, typeParameters: readonly TypeParameterDeclaration[] | undefined, parameters: readonly ParameterDeclaration[], type: TypeNode | undefined, body: Block | undefined): FunctionDeclaration;
     createClassDeclaration(modifiers: readonly ModifierLike[] | undefined, name: string | Identifier | undefined, typeParameters: readonly TypeParameterDeclaration[] | undefined, heritageClauses: readonly HeritageClause[] | undefined, members: readonly ClassElement[]): ClassDeclaration;
     updateClassDeclaration(node: ClassDeclaration, modifiers: readonly ModifierLike[] | undefined, name: Identifier | undefined, typeParameters: readonly TypeParameterDeclaration[] | undefined, heritageClauses: readonly HeritageClause[] | undefined, members: readonly ClassElement[]): ClassDeclaration;
-    createInterfaceDeclaration(modifiers: readonly ModifierLike[] | undefined, name: string | Identifier, typeParameters: readonly TypeParameterDeclaration[] | undefined, heritageClauses: readonly HeritageClause[] | undefined, members: readonly TypeElement[]): InterfaceDeclaration;
+    createInterfaceDeclaration(modifiers: readonly ModifierLike[] | undefined, name: string | Identifier, typeParameters: readonly TypeParameterDeclaration[] | undefined, heritageClauses: readonly HeritageClause[] | undefined, members: readonly TypeElement[], existentialTypeParameters: readonly TypeParameterDeclaration[] | undefined): InterfaceDeclaration;
     updateInterfaceDeclaration(node: InterfaceDeclaration, modifiers: readonly ModifierLike[] | undefined, name: Identifier, typeParameters: readonly TypeParameterDeclaration[] | undefined, heritageClauses: readonly HeritageClause[] | undefined, members: readonly TypeElement[]): InterfaceDeclaration;
     createTypeAliasDeclaration(modifiers: readonly ModifierLike[] | undefined, name: string | Identifier, typeParameters: readonly TypeParameterDeclaration[] | undefined, type: TypeNode): TypeAliasDeclaration;
     updateTypeAliasDeclaration(node: TypeAliasDeclaration, modifiers: readonly ModifierLike[] | undefined, name: Identifier, typeParameters: readonly TypeParameterDeclaration[] | undefined, type: TypeNode): TypeAliasDeclaration;

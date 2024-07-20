@@ -186,6 +186,8 @@ function createInterfaceForTypeLiteral(
         /*typeParameters*/ undefined,
         /*heritageClauses*/ undefined,
         propertySignatures,
+        // TODO(jfet97): support existentials here
+        /*existentialTypeParameters*/ undefined,
     );
 }
 

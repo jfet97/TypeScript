@@ -77,6 +77,7 @@ import {
     EnumDeclaration,
     EnumMember,
     ExclamationToken,
+    ExistentialTypeParameterDeclaration,
     ExportAssignment,
     ExportDeclaration,
     ExportSpecifier,
@@ -86,6 +87,7 @@ import {
     Extension,
     ExternalModuleReference,
     fileExtensionIs,
+    filter,
     findIndex,
     firstOrUndefined,
     forEach,
@@ -4181,6 +4183,42 @@ namespace Parser {
         return withJSDoc(finishNode(node, pos), hasJSDoc);
     }
 
+    // TODO(jfet97): refine return type
+    function parseExistentialTypeMember(): ExistentialTypeParameterDeclaration {
+        const pos = getNodePos();
+        const hasJSDoc = hasPrecedingJSDocComment();
+
+        // TODO(jfet97): /*permitConstAsModifier*/ true
+        const modifiers = parseModifiers(/*allowDecorators*/ false, /*permitConstAsModifier*/ false);
+
+        parseExpected(SyntaxKind.TypeKeyword);
+
+        const name = parseIdentifier();
+
+        // Parse the constraint for the existential type member (similar to how parseTypeParameter does it)
+        let constraint: TypeNode | undefined;
+        let expression: Expression | undefined;
+
+        if (parseOptional(SyntaxKind.ExtendsKeyword)) {
+            if (isStartOfType() || !isStartOfExpression()) {
+                constraint = parseType();
+            }
+            else {
+                expression = parseUnaryExpressionOrHigher();
+            }
+        }
+
+        // Parse the default type for the existential type member
+        const defaultType = parseOptional(SyntaxKind.EqualsToken) ? parseType() : undefined;
+
+        parseSemicolon();
+
+        // TODO(jfet97): let's see if we can avoid the cast
+        const node = factory.createTypeParameterDeclaration(modifiers, name, constraint, defaultType) as ExistentialTypeParameterDeclaration;
+        node.expression = expression;
+        return withJSDoc(finishNode(node, pos), hasJSDoc);
+    }
+
     function isIndexSignature(): boolean {
         return token() === SyntaxKind.OpenBracketToken && lookAhead(isUnambiguouslyIndexSignature);
     }
@@ -4282,6 +4320,10 @@ namespace Parser {
         ) {
             return true;
         }
+        // Existential types
+        if (token() === SyntaxKind.TypeKeyword) {
+            return true;
+        }
         let idToken = false;
         // Eat up all modifiers, but hold on to the last one in case it is actually an identifier
         while (isModifierKind(token())) {
@@ -4317,9 +4359,15 @@ namespace Parser {
         if (token() === SyntaxKind.NewKeyword && lookAhead(nextTokenIsOpenParenOrLessThan)) {
             return parseSignatureMember(SyntaxKind.ConstructSignature);
         }
+
+        if (token() === SyntaxKind.TypeKeyword) {
+            return parseExistentialTypeMember();
+        }
+
         const pos = getNodePos();
         const hasJSDoc = hasPrecedingJSDocComment();
         const modifiers = parseModifiers(/*allowDecorators*/ false);
+
         if (parseContextualModifier(SyntaxKind.GetKeyword)) {
             return parseAccessorDeclaration(pos, hasJSDoc, modifiers, SyntaxKind.GetAccessor, SignatureFlags.Type);
         }
@@ -4413,6 +4461,7 @@ namespace Parser {
         }
         const type = parseTypeAnnotation();
         parseSemicolon();
+        // TODO(jfet97): mapped types shouldn't support existential
         const members = parseList(ParsingContext.TypeMembers, parseTypeMember);
         parseExpected(SyntaxKind.CloseBraceToken);
         return finishNode(factory.createMappedTypeNode(readonlyToken, typeParameter, nameType, questionToken, type, members), pos);
@@ -8198,8 +8247,12 @@ namespace Parser {
         const name = parseIdentifier();
         const typeParameters = parseTypeParameters();
         const heritageClauses = parseHeritageClauses();
-        const members = parseObjectTypeMembers();
-        const node = factory.createInterfaceDeclaration(modifiers, name, typeParameters, heritageClauses, members);
+        const allMembers = parseObjectTypeMembers();
+        const members = filter(allMembers, member => member.kind !== SyntaxKind.TypeParameter);
+        // TODO(jfet97): remove the following cast
+        const existentialTypeParameters = filter(allMembers, member => member.kind === SyntaxKind.TypeParameter) as unknown as readonly TypeParameterDeclaration[];
+
+        const node = factory.createInterfaceDeclaration(modifiers, name, typeParameters, heritageClauses, members, existentialTypeParameters);
         return withJSDoc(finishNode(node, pos), hasJSDoc);
     }
 
