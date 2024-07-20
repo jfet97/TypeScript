@@ -4,4 +4,11 @@
 
 interface Foo {
   type T;
+  getT(): T;
+  setT(t: T): void;
 }
+
+declare const foo: Foo;
+
+const res = foo.getT();
+foo.setT(res);
