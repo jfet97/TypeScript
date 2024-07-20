@@ -4372,6 +4372,7 @@ namespace Parser {
                 // are not existential type declarations
                 return !canParseSemicolon() &&
                 token() !== SyntaxKind.ColonToken &&
+                token() !== SyntaxKind.QuestionToken &&
                 token() !== SyntaxKind.CommaToken &&
                 token() !== SyntaxKind.OpenParenToken &&
                 token() !== SyntaxKind.LessThanToken
