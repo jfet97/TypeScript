@@ -106,6 +106,7 @@ import {
     ImportEqualsDeclaration,
     ImportSpecifier,
     ImportTypeNode,
+    InterfaceDeclaration,
     isAccessExpression,
     isAmbientModule,
     isAnyImportOrReExport,
@@ -1315,7 +1316,13 @@ export function getEffectiveTypeParameterDeclarations(node: DeclarationWithTypeP
         return flatMap(node.parent.tags, tag => isJSDocTemplateTag(tag) ? tag.typeParameters : undefined);
     }
     if (node.typeParameters) {
-        return node.typeParameters;
+        const existentials = (node as InterfaceDeclaration).existentialTypeParameters;
+        if (existentials) {
+            return [...node.typeParameters, ...existentials];
+        }
+        else {
+            return node.typeParameters;
+        }
     }
     if (canHaveIllegalTypeParameters(node) && node.typeParameters) {
         return node.typeParameters;

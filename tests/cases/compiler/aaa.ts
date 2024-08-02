@@ -2,13 +2,15 @@
 // @skipLibCheck: true
 // @declaration: false
 
-interface Foo {
-  type T;
-  getT(): T;
-  setT(t: T): void;
-}
+// interface Foo {
+//   // type T;
+//   // getT(): T;
+//   // setT(t: T): void;
+// }
 
-declare const foo: Foo;
+// declare const foo: Foo;
 
-const res = foo.getT();
-foo.setT(res);
+// type e = Foo["getT"]
+
+// const res = foo.getT();
+// foo.setT(res);

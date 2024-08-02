@@ -4194,6 +4194,7 @@ namespace Parser {
         parseExpected(SyntaxKind.TypeKeyword);
 
         const name = parseIdentifier();
+        console.log({ name });
 
         // Parse the constraint for the existential type member (similar to how parseTypeParameter does it)
         let constraint: TypeNode | undefined;
@@ -4371,13 +4372,14 @@ namespace Parser {
                 //
                 // are not existential type declarations
                 return !canParseSemicolon() &&
-                token() !== SyntaxKind.ColonToken &&
-                token() !== SyntaxKind.QuestionToken &&
-                token() !== SyntaxKind.CommaToken &&
-                token() !== SyntaxKind.OpenParenToken &&
-                token() !== SyntaxKind.LessThanToken
+                    token() !== SyntaxKind.ColonToken &&
+                    token() !== SyntaxKind.QuestionToken &&
+                    token() !== SyntaxKind.CommaToken &&
+                    token() !== SyntaxKind.OpenParenToken &&
+                    token() !== SyntaxKind.LessThanToken;
             })
         ) {
+            console.log("parsing existential");
             return parseExistentialTypeMember();
         }
 
@@ -4426,6 +4428,7 @@ namespace Parser {
     function parseObjectTypeMembers(): NodeArray<TypeElement> {
         let members: NodeArray<TypeElement>;
         if (parseExpected(SyntaxKind.OpenBraceToken)) {
+           // HERE prima parsa i tipi esistenziali, poi i membri dell'oggetto
             members = parseList(ParsingContext.TypeMembers, parseTypeMember);
             parseExpected(SyntaxKind.CloseBraceToken);
         }
@@ -8265,9 +8268,23 @@ namespace Parser {
         const typeParameters = parseTypeParameters();
         const heritageClauses = parseHeritageClauses();
         const allMembers = parseObjectTypeMembers();
-        const members = filter(allMembers, member => member.kind !== SyntaxKind.TypeParameter);
+        // TODO(jfet97): I don't think cloning the positions is the right thing to do here
+        // but if existential type parameters may appear everywhere in the list,
+        // this is the only way to get the correct positions
+        const members = createNodeArray(
+          allMembers.filter(member => member.kind !== SyntaxKind.TypeParameter),
+          allMembers.pos,
+          allMembers.end,
+          allMembers.hasTrailingComma
+        );
         // TODO(jfet97): remove the following cast
-        const existentialTypeParameters = filter(allMembers, member => member.kind === SyntaxKind.TypeParameter) as unknown as readonly TypeParameterDeclaration[];
+        const existentialTypeParameters = createNodeArray(
+          allMembers.filter(member => member.kind === SyntaxKind.TypeParameter),
+          allMembers.pos,
+          allMembers.end,
+          allMembers.hasTrailingComma
+        ) as unknown as readonly TypeParameterDeclaration[]
+        console.log({ existentialTypeParameters, kinds: allMembers.map(m => m.kind) });
 
         const node = factory.createInterfaceDeclaration(modifiers, name, typeParameters, heritageClauses, members, existentialTypeParameters);
         return withJSDoc(finishNode(node, pos), hasJSDoc);
