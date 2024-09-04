@@ -109,7 +109,7 @@ function dependentLikeWrong<K extends Payload["_tag"]>(payload: Payload & { _tag
     }
 }
 
-// it retuns : string | [] | PersonP :)
+
 function dependentLikeSemiGood<P extends Payload>(payload: P) {
   return {
     get key() {
@@ -121,8 +121,15 @@ function dependentLikeSemiGood<P extends Payload>(payload: P) {
     get cart() {
       return payload.cart
     }
-  }[payload._tag]
+  }[payload._tag as P["_tag"]]
 }
+
+const k = dependentLikeSemiGood({} as Extract<Payload, { _tag: "key" }>)
+//    ^?
+const c = dependentLikeSemiGood({} as Extract<Payload, { _tag: "cart" }>)
+//    ^?
+const pp = dependentLikeSemiGood({} as Extract<Payload, { _tag: "person" }>)
+//    ^?
 
 namespace Expected {
   function dependentLike<K extends Payload["_tag"]>(payload: Payload & { _tag: K }) {

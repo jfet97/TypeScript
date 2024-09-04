@@ -131,6 +131,7 @@ import {
     isAccessor,
     isAliasableExpression,
     isAmbientModule,
+    isAsExpression,
     isAssignmentExpression,
     isAssignmentOperator,
     isAssignmentTarget,
@@ -3750,15 +3751,22 @@ function createBinder(): (file: SourceFile, options: CompilerOptions) => void {
             // the following ifs are quite specific, not sure
             if(isAccessor(node) && node.parent.kind === SyntaxKind.ObjectLiteralExpression) {
               const grandParent = node.parent.parent;
-              if(isElementAccessExpression(grandParent)
-                && grandParent.expression.kind === SyntaxKind.ObjectLiteralExpression
-                && grandParent.argumentExpression.kind === SyntaxKind.PropertyAccessExpression
-                && isIdentifier(node.name)) {
-                  node.flowNode = createFlowElementAccess(
-                    currentFlow,
-                    grandParent.argumentExpression as PropertyAccessExpression,
-                    node.name.escapedText
-                  )
+              if(isElementAccessExpression(grandParent)) {
+                let argumentExpression = grandParent.argumentExpression
+
+                while(isAsExpression(argumentExpression)) {
+                  argumentExpression = argumentExpression.expression
+                }
+
+                if(grandParent.expression.kind === SyntaxKind.ObjectLiteralExpression
+                  && argumentExpression.kind === SyntaxKind.PropertyAccessExpression
+                  && isIdentifier(node.name)) {
+                    node.flowNode = createFlowElementAccess(
+                      currentFlow,
+                      argumentExpression as PropertyAccessExpression,
+                      node.name.escapedText
+                    )
+                }
               }
             }
         }
