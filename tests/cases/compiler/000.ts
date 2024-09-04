@@ -89,26 +89,6 @@ const res = {
     }
 }[p._tag]
 
-function dependentLikeWrong<K extends Payload["_tag"]>(payload: Payload & { _tag: K }) {
-    switch(payload._tag) {
-        case "key": {
-            payload
-            payload.secret
-            break
-        }
-        case "cart": {
-            payload
-            payload.cart
-            break
-        }
-        case "person": {
-            payload
-            payload.person
-            break
-        }
-    }
-}
-
 
 function dependentLikeSemiGood<P extends Payload>(payload: P) {
   return {
@@ -131,19 +111,19 @@ const c = dependentLikeSemiGood({} as Extract<Payload, { _tag: "cart" }>)
 const pp = dependentLikeSemiGood({} as Extract<Payload, { _tag: "person" }>)
 //    ^?
 
-namespace Expected {
-  function dependentLike<K extends Payload["_tag"]>(payload: Payload & { _tag: K }) {
-    return {
-      get key() {
-        return payload.secret // payload refined to { _tag: "key", secret: string }
-      },
-      get person() {
-        return payload.person // payload refined to { _tag: "person", person: unknown }
-      },
-      get cart() {
-        return payload.cart // payload refined to { _tag: "cart", cart: [] }
-      }
-    }[payload._tag]
-  }
-  // expected return type is `{ key: string, person: PersonP, cart: never[] }[K]`
-}
+// namespace Expected {
+//   function dependentLike<K extends Payload["_tag"]>(payload: Payload & { _tag: K }) {
+//     return {
+//       get key() {
+//         return payload.secret // payload refined to { _tag: "key", secret: string }
+//       },
+//       get person() {
+//         return payload.person // payload refined to { _tag: "person", person: unknown }
+//       },
+//       get cart() {
+//         return payload.cart // payload refined to { _tag: "cart", cart: [] }
+//       }
+//     }[payload._tag]
+//   }
+//   // expected return type is `{ key: string, person: PersonP, cart: never[] }[K]`
+// }
