@@ -138,5 +138,5 @@ namespace Expected {
       }
     }[payload._tag]
   }
-  // expected return type is `{ key: string, person: unknown, cart: never[] }[K]`
+  // expected return type is `{ key: string, person: PersonP, cart: never[] }[K]`
 }
