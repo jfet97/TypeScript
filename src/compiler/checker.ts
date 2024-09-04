@@ -213,6 +213,8 @@ import {
     FlowAssignment,
     FlowCall,
     FlowCondition,
+    FlowElementAccess,
+    FlowElementAccessData,
     FlowFlags,
     FlowLabel,
     FlowNode,
@@ -28307,8 +28309,8 @@ export function createTypeChecker(host: TypeCheckerHost): TypeChecker {
                 }
                 noCacheCheck = false;
             }
-            if (flags & (FlowFlags.Assignment | FlowFlags.Condition | FlowFlags.ArrayMutation | FlowFlags.SwitchClause)) {
-                flow = (flow as FlowAssignment | FlowCondition | FlowArrayMutation | FlowSwitchClause).antecedent;
+            if (flags & (FlowFlags.Assignment | FlowFlags.Condition | FlowFlags.ArrayMutation | FlowFlags.SwitchClause | FlowFlags.ElementAccess)) {
+                flow = (flow as FlowAssignment | FlowCondition | FlowArrayMutation | FlowSwitchClause | FlowElementAccess).antecedent;
             }
             else if (flags & FlowFlags.Call) {
                 if ((flow as FlowCall).node.expression.kind === SyntaxKind.SuperKeyword) {
@@ -28442,6 +28444,9 @@ export function createTypeChecker(host: TypeCheckerHost): TypeChecker {
                 }
                 else if (flags & FlowFlags.SwitchClause) {
                     type = getTypeAtSwitchClause(flow as FlowSwitchClause);
+                }
+                else if (flags & FlowFlags.ElementAccess) {
+                    type = getTypeAtElementAccess(flow as FlowElementAccess);
                 }
                 else if (flags & FlowFlags.Label) {
                     if ((flow as FlowLabel).antecedent!.length === 1) {
@@ -28676,6 +28681,18 @@ export function createTypeChecker(host: TypeCheckerHost): TypeChecker {
                 if (access) {
                     type = narrowTypeBySwitchOnDiscriminantProperty(type, access, flow.node);
                 }
+            }
+            return createFlowType(type, isIncomplete(flowType));
+        }
+
+        function getTypeAtElementAccess(flow: FlowElementAccess): FlowType {
+            const accessExpr = skipParentheses(flow.node.propertyAccess);
+            const flowType = getTypeAtFlowNode(flow.antecedent);
+            let type = getTypeFromFlowType(flowType);
+
+            const access = getDiscriminantPropertyAccess(accessExpr, type);
+            if (access) {
+                type = narrowTypeByElementAccessOnDiscriminantProperty(type, access, flow.node);
             }
             return createFlowType(type, isIncomplete(flowType));
         }
@@ -28938,6 +28955,10 @@ export function createTypeChecker(host: TypeCheckerHost): TypeChecker {
                 }
             }
             return narrowTypeByDiscriminant(type, access, t => narrowTypeBySwitchOnDiscriminant(t, data));
+        }
+
+        function narrowTypeByElementAccessOnDiscriminantProperty(type: Type, access: AccessExpression | BindingElement | ParameterDeclaration, data: FlowElementAccessData) {
+            return narrowTypeByDiscriminant(type, access, t => narrowTypeByElementAccessOnDiscriminant(t, data));
         }
 
         function narrowTypeByTruthiness(type: Type, expr: Expression, assumeTrue: boolean): Type {
@@ -29222,6 +29243,13 @@ export function createTypeChecker(host: TypeCheckerHost): TypeChecker {
             }
             const defaultType = filterType(type, t => !(isUnitLikeType(t) && contains(switchTypes, t.flags & TypeFlags.Undefined ? undefinedType : getRegularTypeOfLiteralType(extractUnitType(t)))));
             return caseType.flags & TypeFlags.Never ? defaultType : getUnionType([caseType, defaultType]);
+        }
+
+        function narrowTypeByElementAccessOnDiscriminant(type: Type, { name }: FlowElementAccessData) {
+            // not sure about this unescapeLeadingUnderscores, but I'm using it because
+            // name comes from the escaped name of the accessor
+            const accessorNameType = getStringLiteralType(unescapeLeadingUnderscores(name))
+            return replacePrimitivesWithLiterals(filterType(type, t => areTypesComparable(accessorNameType, t)), accessorNameType);
         }
 
         function narrowTypeByTypeName(type: Type, typeName: string) {
