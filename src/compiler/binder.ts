@@ -69,6 +69,7 @@ import {
     FlowAssignment,
     FlowCall,
     FlowCondition,
+    FlowElementAccess,
     FlowFlags,
     FlowLabel,
     FlowNode,
@@ -127,8 +128,10 @@ import {
     IfStatement,
     ImportClause,
     InternalSymbolName,
+    isAccessor,
     isAliasableExpression,
     isAmbientModule,
+    isAsExpression,
     isAssignmentExpression,
     isAssignmentOperator,
     isAssignmentTarget,
@@ -151,6 +154,7 @@ import {
     isDeclarationStatement,
     isDestructuringAssignment,
     isDottedName,
+    isElementAccessExpression,
     isEmptyObjectLiteral,
     isEntityNameExpression,
     isEnumConst,
@@ -1385,6 +1389,11 @@ function createBinder(): (file: SourceFile, options: CompilerOptions) => void {
     function createFlowSwitchClause(antecedent: FlowNode, switchStatement: SwitchStatement, clauseStart: number, clauseEnd: number) {
         setFlowNodeReferenced(antecedent);
         return createFlowNode(FlowFlags.SwitchClause, { switchStatement, clauseStart, clauseEnd }, antecedent) as FlowSwitchClause;
+    }
+
+    function createFlowElementAccess(antecedent: FlowNode, propertyAccess: PropertyAccessExpression, name: __String) {
+      setFlowNodeReferenced(antecedent);
+      return createFlowNode(FlowFlags.ElementAccess, { propertyAccess, name }, antecedent) as FlowElementAccess;
     }
 
     function createFlowMutation(flags: FlowFlags.Assignment | FlowFlags.ArrayMutation, antecedent: FlowNode, node: Expression | VariableDeclaration | ArrayBindingElement) {
@@ -2870,6 +2879,9 @@ function createBinder(): (file: SourceFile, options: CompilerOptions) => void {
             case SyntaxKind.PropertyAccessExpression:
             case SyntaxKind.ElementAccessExpression:
                 const expr = node as PropertyAccessExpression | ElementAccessExpression;
+                // if(node.pos === 1830) {
+                //   debugger
+                // }
                 if (currentFlow && isNarrowableReference(expr)) {
                     expr.flowNode = currentFlow;
                 }
@@ -3731,6 +3743,32 @@ function createBinder(): (file: SourceFile, options: CompilerOptions) => void {
 
         if (currentFlow && isObjectLiteralOrClassExpressionMethodOrAccessor(node)) {
             node.flowNode = currentFlow;
+
+            // if(node?.name?.text === 'cart') {
+            //   debugger
+            // }
+
+            // the following ifs are quite specific, not sure
+            if(isAccessor(node) && node.parent.kind === SyntaxKind.ObjectLiteralExpression) {
+              const grandParent = node.parent.parent;
+              if(isElementAccessExpression(grandParent)) {
+                let argumentExpression = grandParent.argumentExpression
+
+                while(isAsExpression(argumentExpression)) {
+                  argumentExpression = argumentExpression.expression
+                }
+
+                if(grandParent.expression.kind === SyntaxKind.ObjectLiteralExpression
+                  && argumentExpression.kind === SyntaxKind.PropertyAccessExpression
+                  && isIdentifier(node.name)) {
+                    node.flowNode = createFlowElementAccess(
+                      currentFlow,
+                      argumentExpression as PropertyAccessExpression,
+                      node.name.escapedText
+                    )
+                }
+              }
+            }
         }
 
         return hasDynamicName(node)

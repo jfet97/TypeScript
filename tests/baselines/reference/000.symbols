@@ -1,0 +1,62 @@
+//// [tests/cases/compiler/000.ts] ////
+
+=== 000.ts ===
+// declare function test1<T>(arg: {
+//   producer: (s: string) => T,
+//   consumer: (_: T) => void
+// }): T;
+
+declare function test2<T>(arg: {
+>test2 : Symbol(test2, Decl(000.ts, 0, 0))
+>T : Symbol(T, Decl(000.ts, 5, 23))
+>arg : Symbol(arg, Decl(000.ts, 5, 26))
+
+  [K in keyof T]: {
+>K : Symbol(K, Decl(000.ts, 6, 3))
+>T : Symbol(T, Decl(000.ts, 5, 23))
+
+    producer: (s: string) => T[K],
+>producer : Symbol(producer, Decl(000.ts, 6, 19))
+>s : Symbol(s, Decl(000.ts, 7, 15))
+>T : Symbol(T, Decl(000.ts, 5, 23))
+>K : Symbol(K, Decl(000.ts, 6, 3))
+
+    consumer: (_: T[K]) => void
+>consumer : Symbol(consumer, Decl(000.ts, 7, 34))
+>_ : Symbol(_, Decl(000.ts, 8, 15))
+>T : Symbol(T, Decl(000.ts, 5, 23))
+>K : Symbol(K, Decl(000.ts, 6, 3))
+
+  };
+}): T;
+>T : Symbol(T, Decl(000.ts, 5, 23))
+
+// const result1 = test1({
+//   producer: (s) => s.length,
+//   consumer: (x) => console.log(x),
+// });
+
+const result = test2({
+>result : Symbol(result, Decl(000.ts, 17, 5))
+>test2 : Symbol(test2, Decl(000.ts, 0, 0))
+
+  a: {
+>a : Symbol(a, Decl(000.ts, 17, 22))
+
+    producer: () => 123,
+>producer : Symbol(producer, Decl(000.ts, 18, 6))
+
+    consumer: (x) => 0,
+>consumer : Symbol(consumer, Decl(000.ts, 19, 24))
+>x : Symbol(x, Decl(000.ts, 20, 15))
+
+  },
+  // b: {
+  //   producer: () => false,
+  //   consumer: (x) => 0,
+  // },
+  // c: {
+  //   producer: () => false,
+  //   consumer: (x) => 0,
+  // },
+});

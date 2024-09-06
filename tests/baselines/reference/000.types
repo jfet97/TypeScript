@@ -1,0 +1,79 @@
+//// [tests/cases/compiler/000.ts] ////
+
+=== 000.ts ===
+// declare function test1<T>(arg: {
+//   producer: (s: string) => T,
+//   consumer: (_: T) => void
+// }): T;
+
+declare function test2<T>(arg: {
+>test2 : <T>(arg: { [K in keyof T]: { producer: (s: string) => T[K]; consumer: (_: T[K]) => void; }; }) => T
+>      : ^ ^^   ^^                                                                                    ^^^^^ 
+>arg : { [K in keyof T]: { producer: (s: string) => T[K]; consumer: (_: T[K]) => void; }; }
+>    : ^^^ ^^^^^^^^^^^^^^^^^^^^^^^^^^                   ^^^^^^^^^^^^                 ^^^^^^
+
+  [K in keyof T]: {
+    producer: (s: string) => T[K],
+>producer : (s: string) => T[K]
+>         : ^ ^^      ^^^^^    
+>s : string
+>  : ^^^^^^
+
+    consumer: (_: T[K]) => void
+>consumer : (_: T[K]) => void
+>         : ^ ^^    ^^^^^    
+>_ : T[K]
+>  : ^^^^
+
+  };
+}): T;
+
+// const result1 = test1({
+//   producer: (s) => s.length,
+//   consumer: (x) => console.log(x),
+// });
+
+const result = test2({
+>result : { a: number; }
+>       : ^^^^^^^^^^^^^^
+>test2({  a: {    producer: () => 123,    consumer: (x) => 0,  },  // b: {  //   producer: () => false,  //   consumer: (x) => 0,  // },  // c: {  //   producer: () => false,  //   consumer: (x) => 0,  // },}) : { a: number; }
+>                                                                                                                                                                                                                 : ^^^^^^^^^^^^^^
+>test2 : <T>(arg: { [K in keyof T]: { producer: (s: string) => T[K]; consumer: (_: T[K]) => void; }; }) => T
+>      : ^ ^^   ^^                                                                                    ^^^^^ 
+>{  a: {    producer: () => 123,    consumer: (x) => 0,  },  // b: {  //   producer: () => false,  //   consumer: (x) => 0,  // },  // c: {  //   producer: () => false,  //   consumer: (x) => 0,  // },} : { a: { producer: () => number; consumer: (x: number) => number; }; }
+>                                                                                                                                                                                                          : ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^ ^^^^^^^^^^^^^^^^^^^^^^^^^
+
+  a: {
+>a : { producer: () => number; consumer: (x: number) => number; }
+>  : ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^ ^^^^^^^^^^^^^^^^^^^^^^
+>{    producer: () => 123,    consumer: (x) => 0,  } : { producer: () => number; consumer: (x: number) => number; }
+>                                                    : ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^ ^^^^^^^^^^^^^^^^^^^^^^
+
+    producer: () => 123,
+>producer : () => number
+>         : ^^^^^^^^^^^^
+>() => 123 : () => number
+>          : ^^^^^^^^^^^^
+>123 : 123
+>    : ^^^
+
+    consumer: (x) => 0,
+>consumer : (x: number) => number
+>         : ^ ^^^^^^^^^^^^^^^^^^^
+>(x) => 0 : (x: number) => number
+>         : ^ ^^^^^^^^^^^^^^^^^^^
+>x : number
+>  : ^^^^^^
+>0 : 0
+>  : ^
+
+  },
+  // b: {
+  //   producer: () => false,
+  //   consumer: (x) => 0,
+  // },
+  // c: {
+  //   producer: () => false,
+  //   consumer: (x) => 0,
+  // },
+});

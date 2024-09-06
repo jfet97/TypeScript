@@ -4140,6 +4140,7 @@ export const enum FlowFlags {
     ReduceLabel    = 1 << 10, // Temporarily reduce antecedents of label
     Referenced     = 1 << 11, // Referenced as antecedent once
     Shared         = 1 << 12, // Referenced as antecedent more than once
+    ElementAccess  = 1 << 13, // Element access
 
     Label = BranchLabel | LoopLabel,
     Condition = TrueCondition | FalseCondition,
@@ -4155,7 +4156,8 @@ export type FlowNode =
     | FlowSwitchClause
     | FlowArrayMutation
     | FlowCall
-    | FlowReduceLabel;
+    | FlowReduceLabel
+    | FlowElementAccess;
 
 /** @internal */
 export interface FlowNodeBase {
@@ -4221,6 +4223,16 @@ export interface FlowSwitchClauseData {
     switchStatement: SwitchStatement;
     clauseStart: number; // Start index of case/default clause range
     clauseEnd: number; // End index of case/default clause range
+}
+
+export interface FlowElementAccess extends FlowNodeBase {
+    node: FlowElementAccessData;
+    antecedent: FlowNode;
+}
+
+export interface FlowElementAccessData {
+    propertyAccess: PropertyAccessExpression;
+    name: __String;
 }
 
 // FlowArrayMutation represents a node potentially mutates an array, i.e. an
