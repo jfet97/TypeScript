@@ -1,0 +1,208 @@
+//// [tests/cases/compiler/narrowUnionOfObjectsByPrimitiveProperty.ts] ////
+
+=== narrowUnionOfObjectsByPrimitiveProperty.ts ===
+interface State<Type> {
+>State : Symbol(State, Decl(narrowUnionOfObjectsByPrimitiveProperty.ts, 0, 0))
+>Type : Symbol(Type, Decl(narrowUnionOfObjectsByPrimitiveProperty.ts, 0, 16))
+
+  state: Type;
+>state : Symbol(State.state, Decl(narrowUnionOfObjectsByPrimitiveProperty.ts, 0, 23))
+>Type : Symbol(Type, Decl(narrowUnionOfObjectsByPrimitiveProperty.ts, 0, 16))
+}
+
+interface UserName {
+>UserName : Symbol(UserName, Decl(narrowUnionOfObjectsByPrimitiveProperty.ts, 2, 1))
+
+  first: string;
+>first : Symbol(UserName.first, Decl(narrowUnionOfObjectsByPrimitiveProperty.ts, 4, 20))
+
+  last?: string;
+>last : Symbol(UserName.last, Decl(narrowUnionOfObjectsByPrimitiveProperty.ts, 5, 16))
+}
+
+const nameState = {} as {
+>nameState : Symbol(nameState, Decl(narrowUnionOfObjectsByPrimitiveProperty.ts, 9, 5))
+
+  value: string;
+>value : Symbol(value, Decl(narrowUnionOfObjectsByPrimitiveProperty.ts, 9, 25))
+
+  state: State<string>;
+>state : Symbol(state, Decl(narrowUnionOfObjectsByPrimitiveProperty.ts, 10, 16))
+>State : Symbol(State, Decl(narrowUnionOfObjectsByPrimitiveProperty.ts, 0, 0))
+
+} | {
+  value: UserName;
+>value : Symbol(value, Decl(narrowUnionOfObjectsByPrimitiveProperty.ts, 12, 5))
+>UserName : Symbol(UserName, Decl(narrowUnionOfObjectsByPrimitiveProperty.ts, 2, 1))
+
+  state: State<UserName>;
+>state : Symbol(state, Decl(narrowUnionOfObjectsByPrimitiveProperty.ts, 13, 18))
+>State : Symbol(State, Decl(narrowUnionOfObjectsByPrimitiveProperty.ts, 0, 0))
+>UserName : Symbol(UserName, Decl(narrowUnionOfObjectsByPrimitiveProperty.ts, 2, 1))
+}
+
+if (typeof nameState.value === "string") {
+>nameState.value : Symbol(value, Decl(narrowUnionOfObjectsByPrimitiveProperty.ts, 9, 25), Decl(narrowUnionOfObjectsByPrimitiveProperty.ts, 12, 5))
+>nameState : Symbol(nameState, Decl(narrowUnionOfObjectsByPrimitiveProperty.ts, 9, 5))
+>value : Symbol(value, Decl(narrowUnionOfObjectsByPrimitiveProperty.ts, 9, 25), Decl(narrowUnionOfObjectsByPrimitiveProperty.ts, 12, 5))
+
+  nameState.state satisfies  State<string>;
+>nameState.state : Symbol(state, Decl(narrowUnionOfObjectsByPrimitiveProperty.ts, 10, 16))
+>nameState : Symbol(nameState, Decl(narrowUnionOfObjectsByPrimitiveProperty.ts, 9, 5))
+>state : Symbol(state, Decl(narrowUnionOfObjectsByPrimitiveProperty.ts, 10, 16))
+>State : Symbol(State, Decl(narrowUnionOfObjectsByPrimitiveProperty.ts, 0, 0))
+
+} else {
+  nameState.state satisfies State<UserName>;
+>nameState.state : Symbol(state, Decl(narrowUnionOfObjectsByPrimitiveProperty.ts, 13, 18))
+>nameState : Symbol(nameState, Decl(narrowUnionOfObjectsByPrimitiveProperty.ts, 9, 5))
+>state : Symbol(state, Decl(narrowUnionOfObjectsByPrimitiveProperty.ts, 13, 18))
+>State : Symbol(State, Decl(narrowUnionOfObjectsByPrimitiveProperty.ts, 0, 0))
+>UserName : Symbol(UserName, Decl(narrowUnionOfObjectsByPrimitiveProperty.ts, 2, 1))
+}
+
+
+declare const arr: [string, number] | [number, string];
+>arr : Symbol(arr, Decl(narrowUnionOfObjectsByPrimitiveProperty.ts, 24, 13))
+
+if (typeof arr[0] === "string") {
+>arr : Symbol(arr, Decl(narrowUnionOfObjectsByPrimitiveProperty.ts, 24, 13))
+>0 : Symbol(0)
+
+  arr[1] satisfies number;
+>arr : Symbol(arr, Decl(narrowUnionOfObjectsByPrimitiveProperty.ts, 24, 13))
+>1 : Symbol(1)
+
+} else {
+  arr[1] satisfies string;
+>arr : Symbol(arr, Decl(narrowUnionOfObjectsByPrimitiveProperty.ts, 24, 13))
+>1 : Symbol(1)
+}
+
+
+function aStringOrANumber<T extends { a: string } | { a: number }>(param: T): T extends { a: string } ? string : T extends { a: number } ? number : never {
+>aStringOrANumber : Symbol(aStringOrANumber, Decl(narrowUnionOfObjectsByPrimitiveProperty.ts, 29, 1))
+>T : Symbol(T, Decl(narrowUnionOfObjectsByPrimitiveProperty.ts, 32, 26))
+>a : Symbol(a, Decl(narrowUnionOfObjectsByPrimitiveProperty.ts, 32, 37))
+>a : Symbol(a, Decl(narrowUnionOfObjectsByPrimitiveProperty.ts, 32, 53))
+>param : Symbol(param, Decl(narrowUnionOfObjectsByPrimitiveProperty.ts, 32, 67))
+>T : Symbol(T, Decl(narrowUnionOfObjectsByPrimitiveProperty.ts, 32, 26))
+>T : Symbol(T, Decl(narrowUnionOfObjectsByPrimitiveProperty.ts, 32, 26))
+>a : Symbol(a, Decl(narrowUnionOfObjectsByPrimitiveProperty.ts, 32, 89))
+>T : Symbol(T, Decl(narrowUnionOfObjectsByPrimitiveProperty.ts, 32, 26))
+>a : Symbol(a, Decl(narrowUnionOfObjectsByPrimitiveProperty.ts, 32, 124))
+
+  if (typeof param.a === "string") {
+>param.a : Symbol(a, Decl(narrowUnionOfObjectsByPrimitiveProperty.ts, 32, 37), Decl(narrowUnionOfObjectsByPrimitiveProperty.ts, 32, 53))
+>param : Symbol(param, Decl(narrowUnionOfObjectsByPrimitiveProperty.ts, 32, 67))
+>a : Symbol(a, Decl(narrowUnionOfObjectsByPrimitiveProperty.ts, 32, 37), Decl(narrowUnionOfObjectsByPrimitiveProperty.ts, 32, 53))
+
+    return param.a.repeat(3);
+>param.a : Symbol(a, Decl(narrowUnionOfObjectsByPrimitiveProperty.ts, 32, 37))
+>param : Symbol(param, Decl(narrowUnionOfObjectsByPrimitiveProperty.ts, 32, 67))
+>a : Symbol(a, Decl(narrowUnionOfObjectsByPrimitiveProperty.ts, 32, 37))
+  }
+  if (typeof param.a === "number") {
+>param.a : Symbol(a, Decl(narrowUnionOfObjectsByPrimitiveProperty.ts, 32, 53))
+>param : Symbol(param, Decl(narrowUnionOfObjectsByPrimitiveProperty.ts, 32, 67))
+>a : Symbol(a, Decl(narrowUnionOfObjectsByPrimitiveProperty.ts, 32, 53))
+
+    return Math.exp(param.a);
+>Math.exp : Symbol(Math.exp, Decl(lib.es5.d.ts, --, --))
+>Math : Symbol(Math, Decl(lib.es5.d.ts, --, --), Decl(lib.es5.d.ts, --, --))
+>exp : Symbol(Math.exp, Decl(lib.es5.d.ts, --, --))
+>param.a : Symbol(a, Decl(narrowUnionOfObjectsByPrimitiveProperty.ts, 32, 53))
+>param : Symbol(param, Decl(narrowUnionOfObjectsByPrimitiveProperty.ts, 32, 67))
+>a : Symbol(a, Decl(narrowUnionOfObjectsByPrimitiveProperty.ts, 32, 53))
+  }
+  throw new Error()
+>Error : Symbol(Error, Decl(lib.es5.d.ts, --, --), Decl(lib.es5.d.ts, --, --))
+}
+
+aStringOrANumber({ a: "string" })
+>aStringOrANumber : Symbol(aStringOrANumber, Decl(narrowUnionOfObjectsByPrimitiveProperty.ts, 29, 1))
+>a : Symbol(a, Decl(narrowUnionOfObjectsByPrimitiveProperty.ts, 42, 18))
+
+aStringOrANumber({ a: 42 })
+>aStringOrANumber : Symbol(aStringOrANumber, Decl(narrowUnionOfObjectsByPrimitiveProperty.ts, 29, 1))
+>a : Symbol(a, Decl(narrowUnionOfObjectsByPrimitiveProperty.ts, 43, 18))
+
+
+// The following two tests ensure that the discriminativeness of property 'prop'
+// is treated differently in assignability and narrowing, and that the discriminativeness is properly cached.
+declare let obj: { prop: string, other: string } | { prop: number, other: number }
+>obj : Symbol(obj, Decl(narrowUnionOfObjectsByPrimitiveProperty.ts, 48, 11))
+>prop : Symbol(prop, Decl(narrowUnionOfObjectsByPrimitiveProperty.ts, 48, 18))
+>other : Symbol(other, Decl(narrowUnionOfObjectsByPrimitiveProperty.ts, 48, 32))
+>prop : Symbol(prop, Decl(narrowUnionOfObjectsByPrimitiveProperty.ts, 48, 52))
+>other : Symbol(other, Decl(narrowUnionOfObjectsByPrimitiveProperty.ts, 48, 66))
+
+// Here, we first perform narrowing, but the subsequent assignability should not be affected.
+// We expect an error there because of an incorrect value assigned to 'prop'.
+// See contextualTypeWithUnionTypeObjectLiteral.ts
+if(typeof obj.prop === "string") {
+>obj.prop : Symbol(prop, Decl(narrowUnionOfObjectsByPrimitiveProperty.ts, 48, 18), Decl(narrowUnionOfObjectsByPrimitiveProperty.ts, 48, 52))
+>obj : Symbol(obj, Decl(narrowUnionOfObjectsByPrimitiveProperty.ts, 48, 11))
+>prop : Symbol(prop, Decl(narrowUnionOfObjectsByPrimitiveProperty.ts, 48, 18), Decl(narrowUnionOfObjectsByPrimitiveProperty.ts, 48, 52))
+
+  obj.other.repeat(3);
+>obj.other : Symbol(other, Decl(narrowUnionOfObjectsByPrimitiveProperty.ts, 48, 32))
+>obj : Symbol(obj, Decl(narrowUnionOfObjectsByPrimitiveProperty.ts, 48, 11))
+>other : Symbol(other, Decl(narrowUnionOfObjectsByPrimitiveProperty.ts, 48, 32))
+
+} else {
+  Math.exp(obj.other);
+>Math.exp : Symbol(Math.exp, Decl(lib.es5.d.ts, --, --))
+>Math : Symbol(Math, Decl(lib.es5.d.ts, --, --), Decl(lib.es5.d.ts, --, --))
+>exp : Symbol(Math.exp, Decl(lib.es5.d.ts, --, --))
+>obj.other : Symbol(other, Decl(narrowUnionOfObjectsByPrimitiveProperty.ts, 48, 66))
+>obj : Symbol(obj, Decl(narrowUnionOfObjectsByPrimitiveProperty.ts, 48, 11))
+>other : Symbol(other, Decl(narrowUnionOfObjectsByPrimitiveProperty.ts, 48, 66))
+}
+
+obj = { prop: Math.random() > 0.5 ? "whatever" : 42, other: "irrelevant" as never }
+>obj : Symbol(obj, Decl(narrowUnionOfObjectsByPrimitiveProperty.ts, 48, 11))
+>prop : Symbol(prop, Decl(narrowUnionOfObjectsByPrimitiveProperty.ts, 59, 7))
+>Math.random : Symbol(Math.random, Decl(lib.es5.d.ts, --, --))
+>Math : Symbol(Math, Decl(lib.es5.d.ts, --, --), Decl(lib.es5.d.ts, --, --))
+>random : Symbol(Math.random, Decl(lib.es5.d.ts, --, --))
+>other : Symbol(other, Decl(narrowUnionOfObjectsByPrimitiveProperty.ts, 59, 52))
+
+
+declare let obj2: { prop: string, other: string } | { prop: number, other: number }
+>obj2 : Symbol(obj2, Decl(narrowUnionOfObjectsByPrimitiveProperty.ts, 62, 11))
+>prop : Symbol(prop, Decl(narrowUnionOfObjectsByPrimitiveProperty.ts, 62, 19))
+>other : Symbol(other, Decl(narrowUnionOfObjectsByPrimitiveProperty.ts, 62, 33))
+>prop : Symbol(prop, Decl(narrowUnionOfObjectsByPrimitiveProperty.ts, 62, 53))
+>other : Symbol(other, Decl(narrowUnionOfObjectsByPrimitiveProperty.ts, 62, 67))
+
+// Here, we first assign a value to 'obj2' and then perform narrowing.
+// We expect an error here because of an incorrect value assigned to 'prop', like above,
+// but the subsequent narrowing should not be affected by the assignability.
+obj2 = { prop: Math.random() > 0.5 ? "whatever" : 42, other: "irrelevant" as never }
+>obj2 : Symbol(obj2, Decl(narrowUnionOfObjectsByPrimitiveProperty.ts, 62, 11))
+>prop : Symbol(prop, Decl(narrowUnionOfObjectsByPrimitiveProperty.ts, 67, 8))
+>Math.random : Symbol(Math.random, Decl(lib.es5.d.ts, --, --))
+>Math : Symbol(Math, Decl(lib.es5.d.ts, --, --), Decl(lib.es5.d.ts, --, --))
+>random : Symbol(Math.random, Decl(lib.es5.d.ts, --, --))
+>other : Symbol(other, Decl(narrowUnionOfObjectsByPrimitiveProperty.ts, 67, 53))
+
+if(typeof obj2.prop === "string") {
+>obj2.prop : Symbol(prop, Decl(narrowUnionOfObjectsByPrimitiveProperty.ts, 62, 19), Decl(narrowUnionOfObjectsByPrimitiveProperty.ts, 62, 53))
+>obj2 : Symbol(obj2, Decl(narrowUnionOfObjectsByPrimitiveProperty.ts, 62, 11))
+>prop : Symbol(prop, Decl(narrowUnionOfObjectsByPrimitiveProperty.ts, 62, 19), Decl(narrowUnionOfObjectsByPrimitiveProperty.ts, 62, 53))
+
+  obj2.other.repeat(3);
+>obj2.other : Symbol(other, Decl(narrowUnionOfObjectsByPrimitiveProperty.ts, 62, 33))
+>obj2 : Symbol(obj2, Decl(narrowUnionOfObjectsByPrimitiveProperty.ts, 62, 11))
+>other : Symbol(other, Decl(narrowUnionOfObjectsByPrimitiveProperty.ts, 62, 33))
+
+} else {
+  Math.exp(obj2.other);
+>Math.exp : Symbol(Math.exp, Decl(lib.es5.d.ts, --, --))
+>Math : Symbol(Math, Decl(lib.es5.d.ts, --, --), Decl(lib.es5.d.ts, --, --))
+>exp : Symbol(Math.exp, Decl(lib.es5.d.ts, --, --))
+>obj2.other : Symbol(other, Decl(narrowUnionOfObjectsByPrimitiveProperty.ts, 62, 67))
+>obj2 : Symbol(obj2, Decl(narrowUnionOfObjectsByPrimitiveProperty.ts, 62, 11))
+>other : Symbol(other, Decl(narrowUnionOfObjectsByPrimitiveProperty.ts, 62, 67))
+}
