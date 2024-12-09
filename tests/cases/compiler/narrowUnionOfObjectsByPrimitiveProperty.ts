@@ -1,0 +1,165 @@
+// @strict: true
+// @exactOptionalPropertyTypes: true
+// @noEmit: true
+
+export {}
+
+interface State<Type> {
+  state: Type;
+}
+
+interface UserName {
+  first: string;
+  last?: string;
+}
+
+const nameState = {} as {
+  value: string;
+  state: State<string>;
+} | {
+  value: UserName;
+  state: State<UserName>;
+}
+
+if (typeof nameState.value === "string") {
+  nameState.state satisfies  State<string>;
+} else {
+  nameState.state satisfies State<UserName>;
+}
+
+
+declare const arr: [string, number] | [number, string];
+if (typeof arr[0] === "string") {
+  arr[1] satisfies number;
+} else {
+  arr[1] satisfies string;
+}
+
+
+function aStringOrANumber<T extends { a: string } | { a: number }>(param: T): T extends { a: string } ? string : T extends { a: number } ? number : never {
+  if (typeof param.a === "string") {
+    return param.a.repeat(3);
+  }
+  if (typeof param.a === "number") {
+    return Math.exp(param.a);
+  }
+  throw new Error()
+}
+
+aStringOrANumber({ a: "string" })
+aStringOrANumber({ a: 42 })
+
+
+// The following two tests ensure that the discriminativeness of property 'prop'
+// is treated differently in assignability and narrowing, and that the discriminativeness is properly cached.
+declare let obj: { prop: string, other: string } | { prop: number, other: number }
+
+// Here, we first perform narrowing, but the subsequent assignability should not be affected.
+// We expect an error there because of an incorrect value assigned to 'prop'.
+// See contextualTypeWithUnionTypeObjectLiteral.ts
+if(typeof obj.prop === "string") {
+  obj.other.repeat(3);
+} else {
+  Math.exp(obj.other);
+}
+
+obj = { prop: Math.random() > 0.5 ? "whatever" : 42, other: "irrelevant" as never }
+
+
+declare let obj2: { prop: string, other: string } | { prop: number, other: number }
+
+// Here, we first assign a value to 'obj2' and then perform narrowing.
+// We expect an error here because of an incorrect value assigned to 'prop', like above,
+// but the subsequent narrowing should not be affected by the assignability.
+obj2 = { prop: Math.random() > 0.5 ? "whatever" : 42, other: "irrelevant" as never }
+
+if(typeof obj2.prop === "string") {
+  obj2.other.repeat(3);
+} else {
+  Math.exp(obj2.other);
+}
+
+
+interface ILocalizedString {
+    original: string;
+    value: string;
+}
+
+type Opt = ({
+    label: ILocalizedString;
+    alias?: string;
+} | {
+    label: string;
+    alias: string;
+})
+
+declare const opt: Opt
+
+if (typeof opt.label === 'string') {
+    opt
+    // ^?
+    const l = opt.label;
+    const a = opt.alias ?? opt.label;
+} else {
+    opt
+    // ^?
+    const l = opt.label;
+    const a = opt.alias ?? opt.label.original;
+}
+
+
+type PackageDetails = {
+  docsLink?: string;
+  docsLinkWarning?: string;
+  title?: string;
+  description?: string;
+  repo?: string;
+  license?: string;
+};
+
+type PackageDetailsSuccess = PackageDetails & {
+  docsLink: string;
+};
+
+interface FilePathAndName {
+  path: string;
+  name: string;
+}
+
+interface PackageFilePathAndName extends FilePathAndName {
+  packageRegistry: string; // e.g. npm, pypi
+}
+
+type ParsedPackageInfo = {
+  name: string;
+  packageFile: PackageFilePathAndName;
+  language: string;
+  version: string;
+};
+
+
+type PackageDocsResult = {
+    packageInfo: ParsedPackageInfo;
+} & ({
+    error: string;
+    details?: never;
+} | {
+    details: PackageDetailsSuccess;
+    error?: never;
+})
+
+declare const filtered: PackageDocsResult[];
+
+filtered.sort((a, b) => {
+  const rank = (result: PackageDocsResult) => {
+    result.details
+    if (result.error) {
+      return 2;
+    } else if (result.details?.docsLinkWarning) {
+      return 1;
+    } else {
+      return 0;
+    }
+  };
+  return rank(a) - rank(b);
+});
