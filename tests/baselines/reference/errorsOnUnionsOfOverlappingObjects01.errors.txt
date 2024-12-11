@@ -4,6 +4,7 @@ errorsOnUnionsOfOverlappingObjects01.ts(18,3): error TS2345: Argument of type '{
       Type 'string' is not assignable to type 'number'.
 errorsOnUnionsOfOverlappingObjects01.ts(19,12): error TS2322: Type 'string' is not assignable to type 'number'.
 errorsOnUnionsOfOverlappingObjects01.ts(24,5): error TS2353: Object literal may only specify known properties, and 'a' does not exist in type 'Bar | Other'.
+errorsOnUnionsOfOverlappingObjects01.ts(29,5): error TS2353: Object literal may only specify known properties, and 'a' does not exist in type 'Bar'.
 errorsOnUnionsOfOverlappingObjects01.ts(42,10): error TS2345: Argument of type '{ dog: string; }' is not assignable to parameter of type 'ExoticAnimal'.
   Property 'cat' is missing in type '{ dog: string; }' but required in type 'CatDog'.
 errorsOnUnionsOfOverlappingObjects01.ts(43,10): error TS2345: Argument of type '{ man: string; bear: string; }' is not assignable to parameter of type 'ExoticAnimal'.
@@ -13,7 +14,7 @@ errorsOnUnionsOfOverlappingObjects01.ts(47,10): error TS2345: Argument of type '
   Type '{ man: string; beer: string; }' is missing the following properties from type 'ManBearPig': bear, pig
 
 
-==== errorsOnUnionsOfOverlappingObjects01.ts (7 errors) ====
+==== errorsOnUnionsOfOverlappingObjects01.ts (8 errors) ====
     interface Foo {
         a: string;
         b: number;
@@ -52,6 +53,8 @@ errorsOnUnionsOfOverlappingObjects01.ts(47,10): error TS2345: Argument of type '
     
     h(x);
     h({ a: '', b: '' })
+        ~
+!!! error TS2353: Object literal may only specify known properties, and 'a' does not exist in type 'Bar'.
     
     interface CatDog { cat: any, dog: any }
     interface ManBearPig { man: any, bear: any, pig: any }
